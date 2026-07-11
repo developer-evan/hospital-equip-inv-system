@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
@@ -9,6 +10,7 @@ import { Password } from 'primeng/password';
 import { Message } from 'primeng/message';
 
 import { AuthService } from '../../core/services/auth.service';
+import { ApiErrorBody } from '../../core/models/common.model';
 
 @Component({
   selector: 'app-login',
@@ -124,12 +126,6 @@ import { AuthService } from '../../core/services/auth.service';
                 styleClass="!mt-1 !w-full !rounded-xl !border-orange-500 !bg-orange-500 !py-2.5 !text-white hover:!border-orange-400 hover:!bg-orange-400"
               />
             </form>
-
-            <ng-template #footer>
-              <p class="text-center text-xs text-slate-600">
-                Demo: use any username and password when the API is offline.
-              </p>
-            </ng-template>
           </p-card>
         </div>
       </div>
@@ -162,10 +158,29 @@ export class LoginComponent {
       next: () => {
         void this.router.navigate(['/dashboard']);
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.loading.set(false);
-        this.errorMessage.set('Invalid username or password. Please try again.');
+        this.errorMessage.set(this.resolveLoginError(err));
       },
     });
+  }
+
+  private resolveLoginError(err: HttpErrorResponse): string {
+    const body = err.error as ApiErrorBody | undefined;
+    const message = body?.message;
+
+    if (Array.isArray(message)) {
+      return message[0] ?? 'Invalid username or password. Please try again.';
+    }
+
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+
+    if (err.status === 0) {
+      return 'Unable to reach the server. Check that the API is running.';
+    }
+
+    return 'Invalid username or password. Please try again.';
   }
 }
