@@ -33,7 +33,7 @@ import { KpiTrend } from '../../../core/models/dashboard-summary.model';
           [rounded]="true"
           [text]="true"
           severity="secondary"
-          styleClass="!size-8 !text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 hover:!text-slate-300"
+          styleClass="!size-8 !text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 hover:!text-slate-300 hover:!bg-slate-700"
           ariaLabel="More options"
           pTooltip="More options"
           tooltipPosition="top"

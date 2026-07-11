@@ -204,89 +204,85 @@ interface LegendItem {
 
     <!-- Recent activity -->
     <div class="mt-5 overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
-      <div
-        class="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-5 py-4"
-      >
-        <p class="text-sm font-semibold text-white">Recent Transactions</p>
-
-        <div class="flex items-center gap-2">
-          <p-iconfield iconPosition="left" styleClass="w-full sm:w-52">
-            <p-inputicon styleClass="pi pi-search !text-slate-500" />
-            <input
-              pInputText
-              type="search"
-              placeholder="Search"
-              [ngModel]="searchTerm()"
-              (ngModelChange)="searchTerm.set($event)"
-              class="w-full !rounded-lg !border-white/10 !bg-[#1a1d26] !py-2 !pl-9 !text-sm !text-slate-200 placeholder:!text-slate-500"
-              pTooltip="Search by asset, equipment or department"
-              tooltipPosition="top"
-            />
-          </p-iconfield>
-
-          <p-button
-            type="button"
-            icon="pi pi-filter"
-            label="Filter"
-            [outlined]="true"
-            severity="secondary"
-            size="small"
-            styleClass="dashboard-toolbar-btn !rounded-lg !border-white/10 !text-slate-300 hover:!border-white/20 hover:!bg-white/5"
-            pTooltip="Filter transactions"
-            tooltipPosition="top"
-          />
-        </div>
-      </div>
-
       <p-table
         [value]="filteredActivity()"
-        [rows]="10"
-        styleClass="dashboard-table p-datatable-sm"
+        [paginator]="true"
+        [rows]="5"
+        [rowsPerPageOptions]="[5, 10]"
+        [rowHover]="true"
+        [showGridlines]="false"
+        responsiveLayout="scroll"
+        sortMode="single"
+        styleClass="dashboard-table"
+        paginatorStyleClass="dashboard-paginator"
       >
+        <ng-template #caption>
+          <div class="flex flex-wrap items-center justify-between gap-3 px-1 py-1">
+            <div>
+              <p class="text-sm font-semibold text-white">Recent Transactions</p>
+              <p class="mt-0.5 text-xs text-slate-500">
+                {{ filteredActivity().length }} record{{ filteredActivity().length === 1 ? '' : 's' }}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <p-iconfield iconPosition="left" styleClass="w-full sm:w-56">
+                <p-inputicon styleClass="pi pi-search !text-slate-500" />
+                <input
+                  pInputText
+                  type="search"
+                  placeholder="Search transactions"
+                  [ngModel]="searchTerm()"
+                  (ngModelChange)="searchTerm.set($event)"
+                  class="w-full !rounded-lg !border-white/10 !bg-[#1a1d26] !py-2 !pl-9 !text-sm !text-slate-200 placeholder:!text-slate-500"
+                  pTooltip="Search by asset, equipment or department"
+                  tooltipPosition="top"
+                />
+              </p-iconfield>
+
+              <p-button
+                type="button"
+                icon="pi pi-filter"
+                label="Filter"
+                [outlined]="true"
+                severity="secondary"
+                size="small"
+                styleClass="dashboard-toolbar-btn !rounded-lg !border-white/10 !text-slate-300 hover:!border-white/20 hover:!bg-white/5"
+                pTooltip="Filter transactions"
+                tooltipPosition="top"
+              />
+            </div>
+          </div>
+        </ng-template>
+
         <ng-template #header>
           <tr>
-            <th>
-              <p-button
-                type="button"
-                label="Order ID"
-                icon="pi pi-sort-alt"
-                iconPos="right"
-                [text]="true"
-                severity="secondary"
-                styleClass="!p-0 !text-xs !font-medium !uppercase !tracking-wider !text-slate-500 hover:!text-slate-300"
-                pTooltip="Sort by order ID"
-                tooltipPosition="top"
-              />
+            <th pSortableColumn="assetNumber" class="!min-w-[7rem]">
+              <span class="inline-flex items-center gap-1.5">
+                Order ID
+                <p-sortIcon field="assetNumber" />
+              </span>
             </th>
-            <th>Equipment</th>
-            <th>
-              <p-button
-                type="button"
-                label="Status"
-                icon="pi pi-sort-alt"
-                iconPos="right"
-                [text]="true"
-                severity="secondary"
-                styleClass="!p-0 !text-xs !font-medium !uppercase !tracking-wider !text-slate-500 hover:!text-slate-300"
-                pTooltip="Sort by status"
-                tooltipPosition="top"
-              />
+            <th pSortableColumn="equipmentName" class="!min-w-[14rem]">
+              <span class="inline-flex items-center gap-1.5">
+                Equipment
+                <p-sortIcon field="equipmentName" />
+              </span>
             </th>
-            <th>Department</th>
-            <th>
-              <p-button
-                type="button"
-                label="Date"
-                icon="pi pi-sort-alt"
-                iconPos="right"
-                [text]="true"
-                severity="secondary"
-                styleClass="!p-0 !text-xs !font-medium !uppercase !tracking-wider !text-slate-500 hover:!text-slate-300"
-                pTooltip="Sort by date"
-                tooltipPosition="top"
-              />
+            <th pSortableColumn="status" class="!min-w-[8rem]">
+              <span class="inline-flex items-center gap-1.5">
+                Status
+                <p-sortIcon field="status" />
+              </span>
             </th>
-            <th class="w-12"></th>
+            <th pSortableColumn="department" class="!min-w-[7rem]">Department</th>
+            <th pSortableColumn="updatedAt" class="!min-w-[7rem]">
+              <span class="inline-flex items-center gap-1.5">
+                Date
+                <p-sortIcon field="updatedAt" />
+              </span>
+            </th>
+            <th class="!w-12"></th>
           </tr>
         </ng-template>
 
@@ -304,7 +300,10 @@ interface LegendItem {
                   [pTooltip]="row.assignedTo"
                   tooltipPosition="top"
                 />
-                <span class="font-medium text-slate-200">{{ row.equipmentName }}</span>
+                <div class="min-w-0">
+                  <p class="truncate font-medium text-slate-200">{{ row.equipmentName }}</p>
+                  <p class="truncate text-xs text-slate-500">{{ row.assignedTo }}</p>
+                </div>
               </div>
             </td>
             <td>
@@ -334,15 +333,20 @@ interface LegendItem {
 
         <ng-template #emptymessage>
           <tr>
-            <td colspan="6" class="py-12 text-center">
-              <p-button
-                type="button"
-                icon="pi pi-inbox"
-                label="No equipment activity matches your search"
-                [text]="true"
-                severity="secondary"
-                styleClass="!text-slate-500 pointer-events-none"
-              />
+            <td colspan="6">
+              <div class="flex flex-col items-center justify-center gap-3 py-14 text-center">
+                <span
+                  class="flex size-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-slate-500"
+                >
+                  <i class="pi pi-inbox text-xl"></i>
+                </span>
+                <div>
+                  <p class="text-sm font-medium text-slate-300">No transactions found</p>
+                  <p class="mt-1 text-xs text-slate-500">
+                    Try adjusting your search or filter criteria.
+                  </p>
+                </div>
+              </div>
             </td>
           </tr>
         </ng-template>

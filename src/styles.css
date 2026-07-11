@@ -63,17 +63,47 @@ body {
   font-family: inherit;
 }
 
-/* Dashboard table — dark surface styling */
-.dashboard-table.p-datatable .p-datatable-thead > tr > th {
+/* Dashboard table — dark PrimeNG datatable */
+.dashboard-table.p-datatable {
+  background: transparent;
+}
+
+.dashboard-table.p-datatable .p-datatable-header {
   background: transparent;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem 1.25rem;
+}
+
+.dashboard-table.p-datatable .p-datatable-table-container {
+  border: none;
+}
+
+.dashboard-table.p-datatable .p-datatable-thead > tr > th {
+  background: rgba(255, 255, 255, 0.02);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #64748b;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 0.875rem 1.25rem;
+  text-transform: uppercase;
+}
+
+.dashboard-table.p-datatable .p-datatable-thead > tr > th.p-datatable-column-sorted {
+  background: rgba(249, 115, 22, 0.06);
+  color: #fdba74;
+}
+
+.dashboard-table.p-datatable .p-datatable-sort-icon,
+.dashboard-table.p-datatable .p-sortable-column-icon {
   color: #64748b;
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 1.25rem;
-  text-transform: uppercase;
+}
+
+.dashboard-table.p-datatable .p-datatable-thead > tr > th.p-datatable-column-sorted .p-datatable-sort-icon {
+  color: #fb923c;
 }
 
 .dashboard-table.p-datatable .p-datatable-tbody > tr {
@@ -81,18 +111,65 @@ body {
   transition: background-color 0.15s ease;
 }
 
-.dashboard-table.p-datatable .p-datatable-tbody > tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+.dashboard-table.p-datatable .p-datatable-tbody > tr:hover,
+.dashboard-table.p-datatable .p-datatable-tbody > tr.p-datatable-row-hover {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dashboard-table.p-datatable .p-datatable-tbody > tr > td {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 0.9rem 1.25rem;
+  vertical-align: middle;
+}
+
+.dashboard-table.p-datatable .p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
 }
 
 .dashboard-table.p-datatable .p-datatable-emptymessage > td {
   border: none;
+  padding: 0;
+}
+
+/* Paginator */
+.dashboard-paginator.p-paginator {
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  padding: 0.75rem 1.25rem;
+}
+
+.dashboard-paginator.p-paginator .p-paginator-page,
+.dashboard-paginator.p-paginator .p-paginator-first,
+.dashboard-paginator.p-paginator .p-paginator-prev,
+.dashboard-paginator.p-paginator .p-paginator-next,
+.dashboard-paginator.p-paginator .p-paginator-last {
+  color: #94a3b8;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+}
+
+.dashboard-paginator.p-paginator .p-paginator-page.p-paginator-page-selected {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.25);
+  color: #fdba74;
+}
+
+.dashboard-paginator.p-paginator .p-paginator-page:not(.p-disabled):hover,
+.dashboard-paginator.p-paginator .p-paginator-first:not(.p-disabled):hover,
+.dashboard-paginator.p-paginator .p-paginator-prev:not(.p-disabled):hover,
+.dashboard-paginator.p-paginator .p-paginator-next:not(.p-disabled):hover,
+.dashboard-paginator.p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.dashboard-paginator.p-paginator .p-select {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #1a1d26;
 }
 
 /* Toolbar buttons — icon-only on small screens */

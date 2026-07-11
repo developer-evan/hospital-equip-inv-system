@@ -23,7 +23,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       [rounded]="true"
       [text]="true"
       severity="secondary"
-      styleClass="!text-slate-300 hover:!text-white lg:!hidden"
+      styleClass="!text-slate-300 hover:!text-white hover:!bg-slate-700 lg:!hidden"
       ariaLabel="Open navigation menu"
       (onClick)="sidebar.toggleMobile()"
     />
@@ -35,7 +35,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       [rounded]="true"
       [text]="true"
       severity="secondary"
-      styleClass="!hidden !size-9 !text-slate-400 hover:!text-white lg:!inline-flex"
+      styleClass="!hidden !size-9 !text-slate-400 hover:!text-white hover:!bg-slate-700 lg:!inline-flex"
       [ariaLabel]="sidebar.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
       (onClick)="sidebar.toggleCollapsed()"
     />
