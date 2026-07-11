@@ -184,6 +184,35 @@ body {
   }
 }
 
+/* Auth login card */
+.auth-card.p-card {
+  background: #111319;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  box-shadow: none;
+}
+
+.auth-card.p-card .p-card-header {
+  padding: 1.5rem 1.5rem 0;
+  background: transparent;
+  border: none;
+}
+
+.auth-card.p-card .p-card-body {
+  padding: 1.25rem 1.5rem;
+  background: transparent;
+}
+
+.auth-card.p-card .p-card-content {
+  padding: 0;
+}
+
+.auth-card.p-card .p-card-footer {
+  padding: 0 1.5rem 1.5rem;
+  background: transparent;
+  border: none;
+}
+
 /* Dark tooltips */
 .p-tooltip .p-tooltip-text {
   background: #1a1d26;

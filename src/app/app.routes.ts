@@ -1,8 +1,17 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/login.component').then((m) => m.LoginComponent),
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/shell/dashboard-layout.component').then((m) => m.DashboardLayoutComponent),
     children: [
@@ -22,7 +31,8 @@ export const routes: Routes = [
         data: {
           title: 'Equipment',
           icon: 'pi pi-box',
-          description: 'Browse, register and track every asset — list, detail and lifecycle views land here next.',
+          description:
+            'Browse, register and track every asset — list, detail and lifecycle views land here next.',
         },
       },
       {
@@ -46,7 +56,8 @@ export const routes: Routes = [
         data: {
           title: 'Receiving',
           icon: 'pi pi-inbox',
-          description: 'Register new equipment and walk it through installation and status changes.',
+          description:
+            'Register new equipment and walk it through installation and status changes.',
         },
       },
       {
@@ -70,7 +81,8 @@ export const routes: Routes = [
         data: {
           title: 'Users',
           icon: 'pi pi-users',
-          description: 'Administrator-only user management — roles, department assignment and access resets.',
+          description:
+            'Administrator-only user management — roles, department assignment and access resets.',
         },
       },
       {
@@ -94,7 +106,8 @@ export const routes: Routes = [
         data: {
           title: 'Notifications',
           icon: 'pi pi-bell',
-          description: 'Every alert in one place, with read/unread state and quick links back to the source record.',
+          description:
+            'Every alert in one place, with read/unread state and quick links back to the source record.',
         },
       },
       {
@@ -123,5 +136,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: 'login' },
 ];

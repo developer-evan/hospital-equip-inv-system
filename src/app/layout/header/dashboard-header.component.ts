@@ -3,14 +3,18 @@ import { Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { Button } from 'primeng/button';
+import { Avatar } from 'primeng/avatar';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { NAV_SECTIONS } from '../../shared/constants/navigation.constants';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ROLE_LABEL } from '../../core/models/role.enum';
 import { SidebarStateService } from '../services/sidebar-state.service';
 
 @Component({
   selector: 'app-dashboard-header',
-  imports: [Button],
+  imports: [Button, Avatar, TooltipModule],
   host: {
     class:
       'sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-white/5 bg-[#0a0b0f]/90 px-4 backdrop-blur-md md:h-[4.25rem] md:px-5',
@@ -58,16 +62,36 @@ import { SidebarStateService } from '../services/sidebar-state.service';
         severity="secondary"
         styleClass="!text-slate-400 hover:!text-white"
         ariaLabel="Notifications"
+        pTooltip="Notifications"
+        tooltipPosition="bottom"
       />
-      @if (storeContext.can('orders:create')) {
-        <p-button
-          type="button"
-          icon="pi pi-plus"
-          label="New order"
-          size="small"
-          styleClass="hidden !rounded-xl !border-orange-500 !bg-orange-500 !px-3 hover:!border-orange-400 hover:!bg-orange-400 sm:flex"
+
+      <span class="hidden h-6 w-px bg-white/10 sm:block"></span>
+
+      <div class="hidden items-center gap-2 sm:flex">
+        <p-avatar
+          [label]="userInitials()"
+          shape="circle"
+          styleClass="!size-8 !bg-orange-500/20 !text-xs !font-semibold !text-orange-300"
         />
-      }
+        <div class="min-w-0 text-left">
+          <p class="truncate text-sm font-medium text-white">{{ user()?.fullName }}</p>
+          <p class="truncate text-xs text-slate-500">{{ roleLabel() }}</p>
+        </div>
+      </div>
+
+      <p-button
+        type="button"
+        icon="pi pi-sign-out"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        styleClass="!text-slate-400 hover:!text-rose-400"
+        ariaLabel="Sign out"
+        pTooltip="Sign out"
+        tooltipPosition="bottom"
+        (onClick)="logout()"
+      />
     </div>
   `,
 })
@@ -75,6 +99,19 @@ export class DashboardHeaderComponent {
   private readonly router = inject(Router);
   protected readonly sidebar = inject(SidebarStateService);
   protected readonly storeContext = inject(StoreContextService);
+  protected readonly auth = inject(AuthService);
+
+  protected readonly user = this.auth.currentUser;
+
+  protected readonly userInitials = computed(() => {
+    const user = this.user();
+    return user ? this.auth.getInitials(user.fullName) : '';
+  });
+
+  protected readonly roleLabel = computed(() => {
+    const user = this.user();
+    return user ? ROLE_LABEL[user.role] : '';
+  });
 
   private readonly currentUrl = toSignal(
     this.router.events.pipe(
@@ -93,4 +130,8 @@ export class DashboardHeaderComponent {
     );
     return match?.label ?? 'Overview';
   });
+
+  protected logout(): void {
+    this.auth.logout();
+  }
 }
