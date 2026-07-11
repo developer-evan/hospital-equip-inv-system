@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { Role } from './core/models/role.enum';
 
 export const routes: Routes = [
   {
@@ -74,16 +76,10 @@ export const routes: Routes = [
       },
       {
         path: 'users',
+        canActivate: [roleGuard(Role.ADMINISTRATOR)],
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Users',
-          icon: 'pi pi-users',
-          description:
-            'Administrator-only user management — roles, department assignment and access resets.',
-        },
+          import('./features/users/users.component').then((m) => m.UsersComponent),
+        data: { title: 'Users' },
       },
       {
         path: 'reports',

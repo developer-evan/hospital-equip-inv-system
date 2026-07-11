@@ -1,3 +1,10 @@
+export interface PaginationQuery {
+  page?: number;
+  limit?: number;
+  sort?: string;
+  search?: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
   meta: PaginationMeta | Record<string, never>;
