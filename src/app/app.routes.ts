@@ -65,14 +65,8 @@ export const routes: Routes = [
       {
         path: 'departments',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Departments',
-          icon: 'pi pi-building',
-          description: 'Manage hospital departments that equipment and staff are scoped to.',
-        },
+          import('./features/departments/departments.component').then((m) => m.DepartmentsComponent),
+        data: { title: 'Departments' },
       },
       {
         path: 'users',

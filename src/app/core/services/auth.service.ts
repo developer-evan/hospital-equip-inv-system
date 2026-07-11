@@ -7,6 +7,7 @@ import { ApiResponse } from '../models/common.model';
 import { AuthUser, LoginRequest, LoginResponse } from '../models/auth.model';
 import { Role } from '../models/role.enum';
 import { TokenStorageService } from './token-storage.service';
+import { normalizeAuthUser } from '../utils/entity.util';
 
 const USER_KEY = 'heims_user';
 
@@ -54,9 +55,10 @@ export class AuthService {
   }
 
   private persistSession(login: LoginResponse): void {
+    const user = normalizeAuthUser(login.user);
     this.tokens.setTokens(login);
-    localStorage.setItem(USER_KEY, JSON.stringify(login.user));
-    this.currentUserSignal.set(login.user);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    this.currentUserSignal.set(user);
   }
 
   private clearSessionAndRedirect(): void {
@@ -70,7 +72,8 @@ export class AuthService {
     const token = this.tokens.getAccessToken();
     if (!token) return null;
     try {
-      return JSON.parse(localStorage.getItem(USER_KEY) ?? 'null') as AuthUser | null;
+      const stored = JSON.parse(localStorage.getItem(USER_KEY) ?? 'null') as AuthUser | null;
+      return stored ? normalizeAuthUser(stored) : null;
     } catch {
       return null;
     }

@@ -31,6 +31,7 @@ import { ApiErrorBody, PaginationMeta } from '../../core/models/common.model';
 import { Department } from '../../core/models/department.model';
 import { User, UserDepartmentRef } from '../../core/models/user.model';
 import { Role, ROLE_LABEL } from '../../core/models/role.enum';
+import { normalizeUser, resolveEntityId } from '../../core/utils/entity.util';
 
 interface SelectOption<T = string> {
   label: string;
@@ -165,7 +166,7 @@ type DepartmentOption = Department & { _id?: string };
                 <p-toggleswitch
                   [ngModel]="user.isActive"
                   (ngModelChange)="toggleStatus(user, $event)"
-                  [disabled]="statusUpdatingId() === user.id"
+                  [disabled]="statusUpdatingId() === userRecordId(user)"
                   pTooltip="Toggle active status"
                   tooltipPosition="left"
                 />
@@ -425,12 +426,16 @@ export class UsersComponent implements OnInit {
   }
 
   toggleStatus(user: User, isActive: boolean): void {
-    if (this.statusUpdatingId() === user.id) return;
+    const userId = this.userRecordId(user);
+    if (!userId || user.isActive === isActive) return;
+    if (this.statusUpdatingId() === userId) return;
 
-    this.statusUpdatingId.set(user.id);
-    this.usersService.updateStatus(user.id, isActive).subscribe({
+    this.statusUpdatingId.set(userId);
+    this.usersService.updateStatus(userId, isActive).subscribe({
       next: (res) => {
-        this.users.update((list) => list.map((item) => (item.id === user.id ? res.data : item)));
+        this.users.update((list) =>
+          list.map((item) => (this.userRecordId(item) === userId ? res.data : item)),
+        );
         this.statusUpdatingId.set(null);
       },
       error: () => {
@@ -438,6 +443,10 @@ export class UsersComponent implements OnInit {
         this.loadUsers();
       },
     });
+  }
+
+  userRecordId(user: User): string {
+    return resolveEntityId(user);
   }
 
   roleLabel(role: Role): string {
@@ -478,8 +487,9 @@ export class UsersComponent implements OnInit {
       })
       .subscribe({
         next: (res) => {
-          this.users.set(res.data);
-          this.totalRecords.set((res.meta as PaginationMeta).totalItems ?? res.data.length);
+          const users = res.data.map((user) => normalizeUser(user)).filter((user) => !!user.id);
+          this.users.set(users);
+          this.totalRecords.set((res.meta as PaginationMeta).totalItems ?? users.length);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
