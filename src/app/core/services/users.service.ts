@@ -8,7 +8,9 @@ import {
   UpdateUserStatusDto,
   User,
 } from '../models/user.model';
-import { normalizeUser } from '../utils/entity.util';
+import { normalizeUser, normalizeUserProfile } from '../utils/entity.util';
+import { ChangePasswordDto } from '../models/profile.model';
+import { UserProfile } from '../models/profile.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
@@ -42,6 +44,16 @@ export class UsersService {
 
   remove(id: string): Observable<void> {
     return this.api.delete(`/users/${id}`);
+  }
+
+  getMe(): Observable<ApiResponse<UserProfile>> {
+    return this.api.get<UserProfile>('/users/me').pipe(
+      map((res) => ({ ...res, data: normalizeUserProfile(res.data) })),
+    );
+  }
+
+  changeMyPassword(dto: ChangePasswordDto): Observable<ApiResponse<void>> {
+    return this.api.patch<void>('/users/me/password', dto);
   }
 
   private mapUsers(res: ApiResponse<User[]>): ApiResponse<User[]> {

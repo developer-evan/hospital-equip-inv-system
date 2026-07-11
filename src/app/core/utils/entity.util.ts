@@ -1,5 +1,16 @@
 import { AuthUser } from '../models/auth.model';
 import { Department } from '../models/department.model';
+import { Equipment, EquipmentDepartmentRef } from '../models/equipment.model';
+import { EquipmentStatus } from '../models/equipment-status.enum';
+import {
+  MaintenanceEngineerRef,
+  MaintenanceEquipmentRef,
+  MaintenanceRecord,
+} from '../models/maintenance.model';
+import { MaintenanceStatus } from '../models/maintenance-status.enum';
+import { MaintenanceType } from '../models/maintenance-type.enum';
+import { Notification } from '../models/notification.model';
+import { UserProfile } from '../models/profile.model';
 import { Role } from '../models/role.enum';
 import { User, UserDepartmentRef } from '../models/user.model';
 
@@ -77,6 +88,57 @@ export function normalizeDepartment(raw: unknown): Department {
   };
 }
 
+function normalizeEquipmentDepartment(raw: unknown): string | EquipmentDepartmentRef {
+  if (typeof raw === 'string') return raw;
+
+  const department = asRecord(raw);
+  const id = resolveEntityId(department);
+  if (!id) return '';
+
+  return {
+    id,
+    name: String(department['name'] ?? ''),
+    code: department['code'] ? String(department['code']) : undefined,
+  };
+}
+
+export function normalizeEquipment(raw: unknown): Equipment {
+  const record = asRecord(raw);
+
+  return {
+    id: resolveEntityId(record),
+    assetNumber: String(record['assetNumber'] ?? ''),
+    name: String(record['name'] ?? ''),
+    category: String(record['category'] ?? ''),
+    manufacturer: String(record['manufacturer'] ?? ''),
+    model: record['model'] ? String(record['model']) : undefined,
+    serialNumber: String(record['serialNumber'] ?? ''),
+    status: record['status'] as EquipmentStatus,
+    department: normalizeEquipmentDepartment(record['department']),
+    roomLocation: record['roomLocation'] ? String(record['roomLocation']) : undefined,
+    supplier: record['supplier'] ? String(record['supplier']) : undefined,
+    purchaseDate: record['purchaseDate'] as string | undefined,
+    warrantyStartDate: record['warrantyStartDate'] as string | undefined,
+    warrantyEndDate: record['warrantyEndDate'] as string | undefined,
+    cost: typeof record['cost'] === 'number' ? record['cost'] : undefined,
+    pmFrequencyDays:
+      typeof record['pmFrequencyDays'] === 'number' ? record['pmFrequencyDays'] : undefined,
+    calibrationFrequencyDays:
+      typeof record['calibrationFrequencyDays'] === 'number'
+        ? record['calibrationFrequencyDays']
+        : undefined,
+    photoUrls: Array.isArray(record['photoUrls'])
+      ? record['photoUrls'].map(String)
+      : undefined,
+    manualUrls: Array.isArray(record['manualUrls'])
+      ? record['manualUrls'].map(String)
+      : undefined,
+    qrCodeUrl: record['qrCodeUrl'] ? String(record['qrCodeUrl']) : undefined,
+    createdAt: record['createdAt'] as string | undefined,
+    updatedAt: record['updatedAt'] as string | undefined,
+  };
+}
+
 export function normalizeAuthUser(raw: unknown): AuthUser {
   const record = asRecord(raw);
   const departmentsRaw = Array.isArray(record['departments']) ? record['departments'] : [];
@@ -90,5 +152,70 @@ export function normalizeAuthUser(raw: unknown): AuthUser {
     departments: departmentsRaw.map((dept) =>
       typeof dept === 'string' ? dept : resolveEntityId(dept),
     ),
+  };
+}
+
+function normalizeMaintenanceRef(
+  raw: unknown,
+): string | MaintenanceEquipmentRef | MaintenanceEngineerRef {
+  if (typeof raw === 'string') return raw;
+  const record = asRecord(raw);
+  const id = resolveEntityId(record);
+  if (record['fullName']) {
+    return { id, fullName: String(record['fullName']) };
+  }
+  return {
+    id,
+    name: String(record['name'] ?? ''),
+    assetNumber: record['assetNumber'] ? String(record['assetNumber']) : undefined,
+  };
+}
+
+export function normalizeMaintenance(raw: unknown): MaintenanceRecord {
+  const record = asRecord(raw);
+
+  return {
+    id: resolveEntityId(record),
+    equipment: normalizeMaintenanceRef(record['equipment']) as string | MaintenanceEquipmentRef,
+    type: record['type'] as MaintenanceType,
+    status: record['status'] as MaintenanceStatus,
+    scheduledDate: String(record['scheduledDate'] ?? ''),
+    performedDate: record['performedDate'] as string | undefined,
+    engineer: record['engineer']
+      ? (normalizeMaintenanceRef(record['engineer']) as string | MaintenanceEngineerRef)
+      : undefined,
+    serviceReport: record['serviceReport'] ? String(record['serviceReport']) : undefined,
+    createdAt: record['createdAt'] as string | undefined,
+    updatedAt: record['updatedAt'] as string | undefined,
+  };
+}
+
+export function normalizeNotification(raw: unknown): Notification {
+  const record = asRecord(raw);
+
+  return {
+    id: resolveEntityId(record),
+    title: String(record['title'] ?? ''),
+    message: String(record['message'] ?? record['body'] ?? ''),
+    isRead: record['isRead'] === true || record['read'] === true,
+    type: record['type'] ? String(record['type']) : undefined,
+    link: record['link'] ? String(record['link']) : undefined,
+    createdAt: String(record['createdAt'] ?? ''),
+  };
+}
+
+export function normalizeUserProfile(raw: unknown): UserProfile {
+  const record = asRecord(raw);
+
+  return {
+    id: resolveEntityId(record),
+    username: String(record['username'] ?? ''),
+    email: String(record['email'] ?? ''),
+    fullName: String(record['fullName'] ?? ''),
+    role: record['role'] as Role,
+    departments: normalizeUserDepartments(record['departments']),
+    isActive: record['isActive'] !== false,
+    lastLoginAt: record['lastLoginAt'] as string | undefined,
+    createdAt: record['createdAt'] as string | undefined,
   };
 }

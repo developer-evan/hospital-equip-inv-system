@@ -32,4 +32,14 @@ export class ApiService {
   delete(path: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}${path}`);
   }
+
+  downloadFile(path: string, query: Record<string, unknown> = {}): Observable<Blob> {
+    const params = Object.fromEntries(
+      Object.entries(query).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+    );
+    return this.http.get(`${environment.apiUrl}${path}`, {
+      params: params as Record<string, string>,
+      responseType: 'blob',
+    });
+  }
 }

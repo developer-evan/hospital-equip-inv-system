@@ -27,40 +27,20 @@ export const routes: Routes = [
       {
         path: 'equipment',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Equipment',
-          icon: 'pi pi-box',
-          description:
-            'Browse, register and track every asset — list, detail and lifecycle views land here next.',
-        },
+          import('./features/equipment/equipment.component').then((m) => m.EquipmentComponent),
+        data: { title: 'Equipment' },
       },
       {
         path: 'maintenance',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Maintenance',
-          icon: 'pi pi-wrench',
-          description: 'Preventive, corrective and calibration schedules with completion logs.',
-        },
+          import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent),
+        data: { title: 'Maintenance' },
       },
       {
         path: 'receiving',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Receiving',
-          icon: 'pi pi-inbox',
-          description:
-            'Register new equipment and walk it through installation and status changes.',
-        },
+          import('./features/receiving/receiving.component').then((m) => m.ReceivingComponent),
+        data: { title: 'Receiving' },
       },
       {
         path: 'departments',
@@ -77,52 +57,30 @@ export const routes: Routes = [
       },
       {
         path: 'reports',
+        canActivate: [roleGuard(Role.ADMINISTRATOR)],
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Reports',
-          icon: 'pi pi-chart-bar',
-          description: 'Export inventory, breakdown, PM and engineer-work reports as Excel or PDF.',
-        },
+          import('./features/reports/reports.component').then((m) => m.ReportsComponent),
+        data: { title: 'Reports' },
       },
       {
         path: 'notifications',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
+          import('./features/notifications/notifications.component').then(
+            (m) => m.NotificationsComponent,
           ),
-        data: {
-          title: 'Notifications',
-          icon: 'pi pi-bell',
-          description:
-            'Every alert in one place, with read/unread state and quick links back to the source record.',
-        },
+        data: { title: 'Notifications' },
       },
       {
         path: 'settings',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'Settings',
-          icon: 'pi pi-cog',
-          description: 'Facility profile, notification preferences and system configuration.',
-        },
+          import('./features/settings/settings.component').then((m) => m.SettingsComponent),
+        data: { title: 'Settings' },
       },
       {
         path: 'profile',
         loadComponent: () =>
-          import('./shared/components/placeholder-page/placeholder-page.component').then(
-            (m) => m.PlaceholderPageComponent,
-          ),
-        data: {
-          title: 'My Profile',
-          icon: 'pi pi-user',
-          description: 'Your account details and password.',
-        },
+          import('./features/profile/profile.component').then((m) => m.ProfileComponent),
+        data: { title: 'My Profile' },
       },
     ],
   },
