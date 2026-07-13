@@ -1,4 +1,5 @@
 import { PaginationQuery } from './common.model';
+import { EquipmentDepartmentRef } from './equipment.model';
 import { MaintenanceStatus } from './maintenance-status.enum';
 import { MaintenanceType } from './maintenance-type.enum';
 
@@ -6,6 +7,7 @@ export interface MaintenanceEquipmentRef {
   id: string;
   name: string;
   assetNumber?: string;
+  department?: string | EquipmentDepartmentRef;
 }
 
 export interface MaintenanceEngineerRef {
@@ -20,8 +22,10 @@ export interface MaintenanceRecord {
   status: MaintenanceStatus;
   scheduledDate: string;
   performedDate?: string;
+  nextDueDate?: string;
   engineer?: string | MaintenanceEngineerRef;
   serviceReport?: string;
+  photoUrls?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -30,6 +34,12 @@ export interface CreateMaintenanceDto {
   equipment: string;
   type: MaintenanceType;
   scheduledDate: string;
+  engineer?: string;
+}
+
+export interface UpdateMaintenanceDto {
+  type?: MaintenanceType;
+  scheduledDate?: string;
   engineer?: string;
 }
 

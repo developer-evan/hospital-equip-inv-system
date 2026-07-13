@@ -71,31 +71,31 @@ export class DashboardService {
         value: formatCount(summary.underRepair),
         icon: 'pi pi-wrench',
       },
-      {
-        label: 'PM Due This Month',
-        value: formatCount(summary.pmDueThisMonth),
-        icon: 'pi pi-calendar-clock',
-      },
+      // {
+      //   label: 'PM Due This Month',
+      //   value: formatCount(summary.pmDueThisMonth),
+      //   icon: 'pi pi-calendar-clock',
+      // },
       {
         label: 'Pending Installation',
         value: formatCount(summary.pendingInstallation),
         icon: 'pi pi-clock',
       },
-      {
-        label: 'Condemned',
-        value: formatCount(summary.condemned),
-        icon: 'pi pi-times-circle',
-      },
-      {
-        label: 'Decommissioned',
-        value: formatCount(summary.decommissioned),
-        icon: 'pi pi-ban',
-      },
-      {
-        label: 'Received Today',
-        value: formatCount(summary.receivedToday),
-        icon: 'pi pi-inbox',
-      },
+      // {
+      //   label: 'Condemned',
+      //   value: formatCount(summary.condemned),
+      //   icon: 'pi pi-times-circle',
+      // },
+      // {
+      //   label: 'Decommissioned',
+      //   value: formatCount(summary.decommissioned),
+      //   icon: 'pi pi-ban',
+      // },
+      // {
+      //   label: 'Received Today',
+      //   value: formatCount(summary.receivedToday),
+      //   icon: 'pi pi-inbox',
+      // },
     ];
   }
 

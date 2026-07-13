@@ -164,11 +164,17 @@ function normalizeMaintenanceRef(
   if (record['fullName']) {
     return { id, fullName: String(record['fullName']) };
   }
-  return {
+  const ref: MaintenanceEquipmentRef = {
     id,
     name: String(record['name'] ?? ''),
     assetNumber: record['assetNumber'] ? String(record['assetNumber']) : undefined,
   };
+
+  if (record['department'] !== undefined && record['department'] !== null) {
+    ref.department = normalizeEquipmentDepartment(record['department']);
+  }
+
+  return ref;
 }
 
 export function normalizeMaintenance(raw: unknown): MaintenanceRecord {
@@ -181,10 +187,14 @@ export function normalizeMaintenance(raw: unknown): MaintenanceRecord {
     status: record['status'] as MaintenanceStatus,
     scheduledDate: String(record['scheduledDate'] ?? ''),
     performedDate: record['performedDate'] as string | undefined,
+    nextDueDate: record['nextDueDate'] as string | undefined,
     engineer: record['engineer']
       ? (normalizeMaintenanceRef(record['engineer']) as string | MaintenanceEngineerRef)
       : undefined,
     serviceReport: record['serviceReport'] ? String(record['serviceReport']) : undefined,
+    photoUrls: Array.isArray(record['photoUrls'])
+      ? record['photoUrls'].map(String)
+      : undefined,
     createdAt: record['createdAt'] as string | undefined,
     updatedAt: record['updatedAt'] as string | undefined,
   };
