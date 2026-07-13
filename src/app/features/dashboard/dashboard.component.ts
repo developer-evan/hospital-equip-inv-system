@@ -99,7 +99,7 @@ interface LegendItem {
           type="button"
           icon="pi pi-chart-line"
           label="View Reports"
-          styleClass="dashboard-toolbar-btn !rounded-xl !border-orange-500 !bg-orange-500 !text-white hover:!border-orange-400 hover:!bg-orange-400"
+          styleClass="dashboard-toolbar-btn !rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           pTooltip="Open reports"
           tooltipPosition="bottom"
           (onClick)="goToReports()"
@@ -387,7 +387,7 @@ export class DashboardComponent implements OnInit {
     {
       label: 'Equipment',
       data: (this.summary()?.byDepartment ?? []).map((item) => item.count),
-      color: '#f97316',
+      color: '#10b981',
     },
   ]);
 
@@ -409,7 +409,7 @@ export class DashboardComponent implements OnInit {
     {
       label: 'This week',
       data: (this.summary()?.operationalHealth ?? []).map((metric) => metric.thisWeek),
-      color: '#f97316',
+      color: '#10b981',
     },
     {
       label: 'Last week',

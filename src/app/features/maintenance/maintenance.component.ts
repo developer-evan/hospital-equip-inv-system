@@ -61,7 +61,7 @@ interface SelectOption<T = string> {
         <p class="mt-1 text-sm text-muted-color">Schedule and complete preventive, corrective and calibration work.</p>
       </div>
       @if (canCreate()) {
-        <p-button type="button" icon="pi pi-plus" label="Schedule Maintenance" styleClass="!rounded-xl !border-orange-500 !bg-orange-500" (onClick)="openCreateDialog()" />
+        <p-button type="button" icon="pi pi-plus" label="Schedule Maintenance" styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast" (onClick)="openCreateDialog()" />
       }
     </div>
 

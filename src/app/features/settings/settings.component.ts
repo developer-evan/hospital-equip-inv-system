@@ -85,7 +85,7 @@ const PREFS_KEY = 'heims_notification_prefs';
           </div>
         </div>
         <div class="mt-6 flex justify-end">
-          <p-button type="button" label="Save preferences" icon="pi pi-save" styleClass="!rounded-xl !border-orange-500 !bg-orange-500" (onClick)="savePrefs()" />
+          <p-button type="button" label="Save preferences" icon="pi pi-save" styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast" (onClick)="savePrefs()" />
         </div>
       </p-card>
 

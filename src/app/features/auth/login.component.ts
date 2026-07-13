@@ -25,7 +25,7 @@ import { ApiErrorBody } from '../../core/models/common.model';
         <div class="relative z-10">
           <div class="flex items-center gap-3">
             <div
-              class="flex size-10 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/25"
+              class="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-contrast shadow-lg shadow-primary/25"
             >
               <i class="pi pi-heart-fill"></i>
             </div>
@@ -48,11 +48,11 @@ import { ApiErrorBody } from '../../core/models/common.model';
         </p>
 
         <div
-          class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-orange-500/10 blur-3xl"
+          class="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-primary/10 blur-3xl"
           aria-hidden="true"
         ></div>
         <div
-          class="pointer-events-none absolute -bottom-16 left-10 size-56 rounded-full bg-orange-500/5 blur-3xl"
+          class="pointer-events-none absolute -bottom-16 left-10 size-56 rounded-full bg-primary/5 blur-3xl"
           aria-hidden="true"
         ></div>
       </div>
@@ -63,7 +63,7 @@ import { ApiErrorBody } from '../../core/models/common.model';
           <div class="mb-8 lg:hidden">
             <div class="flex items-center gap-3">
               <div
-                class="flex size-10 items-center justify-center rounded-xl bg-orange-500 text-white"
+                class="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-contrast"
               >
                 <i class="pi pi-heart-fill"></i>
               </div>
@@ -123,7 +123,7 @@ import { ApiErrorBody } from '../../core/models/common.model';
                 icon="pi pi-sign-in"
                 [loading]="loading()"
                 [disabled]="form.invalid || loading()"
-                styleClass="!mt-1 !w-full !rounded-xl !border-orange-500 !bg-orange-500 !py-2.5 !text-white hover:!border-orange-400 hover:!bg-orange-400"
+                styleClass="!mt-1 !w-full !rounded-xl !border-primary !bg-primary !py-2.5 !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
               />
             </form>
           </p-card>

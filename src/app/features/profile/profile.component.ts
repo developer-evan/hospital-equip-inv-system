@@ -28,7 +28,7 @@ import { ROLE_LABEL } from '../../core/models/role.enum';
       <div class="grid max-w-3xl gap-4">
         <p-card styleClass="!rounded-2xl !border-surface !bg-surface-0 dark:bg-surface-900">
           <div class="flex items-start gap-4">
-            <span class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500/15 text-lg font-semibold text-orange-300">
+            <span class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-lg font-semibold text-primary-300">
               {{ initials(profile()!.fullName) }}
             </span>
             <div class="min-w-0 flex-1">
@@ -78,7 +78,7 @@ import { ROLE_LABEL } from '../../core/models/role.enum';
             <p-password formControlName="currentPassword" placeholder="Current password" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-surface !py-2.5" />
             <p-password formControlName="newPassword" placeholder="New password (min 8 chars)" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-surface !py-2.5" />
             <div class="flex justify-end">
-              <p-button type="submit" label="Update password" icon="pi pi-lock" [loading]="saving()" [disabled]="passwordForm.invalid || saving()" styleClass="!rounded-xl !border-orange-500 !bg-orange-500" />
+              <p-button type="submit" label="Update password" icon="pi pi-lock" [loading]="saving()" [disabled]="passwordForm.invalid || saving()" styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast" />
             </div>
           </form>
         </p-card>

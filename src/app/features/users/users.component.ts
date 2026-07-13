@@ -74,7 +74,7 @@ type DepartmentOption = Department & { _id?: string };
         type="button"
         icon="pi pi-user-plus"
         label="New User"
-        styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+        styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
         (onClick)="openCreateDialog()"
       />
     </div>
@@ -133,7 +133,7 @@ type DepartmentOption = Department & { _id?: string };
                 <p-avatar
                   [label]="initials(user.fullName)"
                   shape="circle"
-                  styleClass="!size-9 !bg-orange-500/15 !text-xs !font-semibold !text-orange-300"
+                  styleClass="!size-9 !bg-primary/15 !text-xs !font-semibold !text-primary-300"
                 />
                 <div class="min-w-0">
                   <p class="truncate font-medium text-color">{{ user.fullName }}</p>
@@ -313,7 +313,7 @@ type DepartmentOption = Department & { _id?: string };
             icon="pi pi-check"
             [loading]="saving()"
             [disabled]="form.invalid || saving()"
-            styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+            styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           />
         </div>
       </form>

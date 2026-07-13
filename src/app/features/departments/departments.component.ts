@@ -61,7 +61,7 @@ type DepartmentRecord = Department & { _id?: string };
           type="button"
           icon="pi pi-plus"
           label="New Department"
-          styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+          styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           (onClick)="openCreateDialog()"
         />
       }
@@ -120,7 +120,7 @@ type DepartmentRecord = Department & { _id?: string };
             <td>
               <div class="flex items-center gap-3">
                 <span
-                  class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-surface text-sm font-semibold text-orange-300"
+                  class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-surface text-sm font-semibold text-primary-300"
                 >
                   {{ dept.code.slice(0, 2).toUpperCase() }}
                 </span>
@@ -258,7 +258,7 @@ type DepartmentRecord = Department & { _id?: string };
             icon="pi pi-check"
             [loading]="saving()"
             [disabled]="form.invalid || saving()"
-            styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+            styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           />
         </div>
       </form>

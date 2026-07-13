@@ -1,7 +1,5 @@
 import { Component, computed, inject, output } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, startWith } from 'rxjs';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
@@ -14,7 +12,6 @@ import { NavIconComponent } from '../../shared/components/nav-icon/nav-icon.comp
 import {
   FOOTER_LINKS,
   NAV_SECTIONS,
-  NavItem,
 } from '../../shared/constants/navigation.constants';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { SidebarStateService } from '../services/sidebar-state.service';
@@ -22,6 +19,8 @@ import { SidebarStateService } from '../services/sidebar-state.service';
 @Component({
   selector: 'app-sidebar',
   imports: [
+    RouterLink,
+    RouterLinkActive,
     IconField,
     InputIcon,
     InputText,
@@ -42,7 +41,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       [class.lg:px-3]="sidebar.collapsed()"
     >
       <div
-        class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+        class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-contrast shadow-lg shadow-primary/20"
         aria-hidden="true"
       >
         <svg viewBox="0 0 24 24" class="size-5 fill-current" role="img">
@@ -113,41 +112,38 @@ import { SidebarStateService } from '../services/sidebar-state.service';
               <div class="flex flex-col gap-0.5">
                 @for (item of section.items; track item.route) {
                   <div class="relative">
-                    <span
-                      class="pointer-events-none absolute inset-y-1.5 left-0 z-10 w-1 rounded-r-full bg-orange-500 transition-opacity"
-                      [class.opacity-0]="!isActive(item.route)"
-                      [class.opacity-100]="isActive(item.route)"
-                      aria-hidden="true"
-                    ></span>
-
-                    <p-button
-                      type="button"
-                      [text]="true"
-                      severity="secondary"
-                      [styleClass]="navItemClass(item)"
-                      [ariaLabel]="item.label"
+                    <a
+                      #rla="routerLinkActive"
+                      [routerLink]="item.route"
+                      [routerLinkActiveOptions]="activeLinkOptions(item.route)"
+                      routerLinkActive="sidebar-nav-active"
+                      [class]="navLinkClass()"
+                      [attr.aria-current]="rla.isActive ? 'page' : null"
+                      [attr.aria-label]="item.label"
                       [pTooltip]="item.label"
                       tooltipPosition="right"
                       [tooltipDisabled]="!sidebar.collapsed()"
-                      (onClick)="navigateTo(item)"
+                      (click)="onNavigate()"
                     >
                       <span
-                        class="flex w-full items-center gap-3"
-                        [class.justify-center]="sidebar.collapsed()"
-                      >
-                        <app-nav-icon [name]="item.icon" [active]="isActive(item.route)" />
+                        class="pointer-events-none absolute inset-y-1.5 left-0 z-10 w-1 rounded-r-full bg-primary transition-opacity"
+                        [class.opacity-0]="!rla.isActive"
+                        [class.opacity-100]="rla.isActive"
+                        aria-hidden="true"
+                      ></span>
 
-                        @if (!sidebar.collapsed()) {
-                          <span class="flex-1 truncate text-left text-sm font-medium">{{
-                            item.label
-                          }}</span>
+                      <app-nav-icon [name]="item.icon" [active]="rla.isActive" />
 
-                          @if (item.hasChildren) {
-                            <i class="pi pi-chevron-down text-xs text-muted-color" aria-hidden="true"></i>
-                          }
+                      @if (!sidebar.collapsed()) {
+                        <span class="flex-1 truncate text-left text-sm font-medium">{{
+                          item.label
+                        }}</span>
+
+                        @if (item.hasChildren) {
+                          <i class="pi pi-chevron-down text-xs text-muted-color" aria-hidden="true"></i>
                         }
-                      </span>
-                    </p-button>
+                      }
+                    </a>
                   </div>
                 }
               </div>
@@ -202,7 +198,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
           <p-avatar
             [label]="storeProfile().initials"
             shape="circle"
-            styleClass="!size-9 !bg-orange-300/90 !text-sm !font-semibold !text-orange-950 shrink-0"
+            styleClass="!size-9 !bg-primary/20 !text-sm !font-semibold !text-primary shrink-0"
           />
 
           @if (!sidebar.collapsed()) {
@@ -227,15 +223,6 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   protected readonly footerLinks = FOOTER_LINKS;
 
-  private readonly currentUrl = toSignal(
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      map(() => this.router.url),
-      startWith(this.router.url),
-    ),
-    { initialValue: this.router.url },
-  );
-
   protected readonly navSections = computed(() =>
     NAV_SECTIONS.map((section) => ({
       ...section,
@@ -249,26 +236,20 @@ export class SidebarComponent {
 
   readonly navigated = output<void>();
 
-  protected isActive(route: string): boolean {
-    const url = this.currentUrl();
-    return route === '/dashboard'
-      ? url === route
-      : url === route || url.startsWith(`${route}/`);
+  protected activeLinkOptions(route: string) {
+    return route === '/dashboard' ? { exact: true } : { exact: false };
   }
 
-  protected navItemClass(item: NavItem): string {
-    const base =
-      '!w-full !justify-start !rounded-xl !border-0 !px-3 !py-2.5 !shadow-none transition-colors';
-    const collapsed = this.sidebar.collapsed() ? ' !px-2 !justify-center' : '';
-    const active = this.isActive(item.route)
-      ? ' !bg-emphasis !text-color hover:!bg-emphasis'
-      : ' !bg-transparent !text-muted-color hover:!bg-emphasis hover:!text-color';
-    return `${base}${collapsed}${active}`;
+  protected navLinkClass(): string {
+    const collapsed = this.sidebar.collapsed();
+    return collapsed
+      ? 'sidebar-nav-item sidebar-nav-item--collapsed'
+      : 'sidebar-nav-item';
   }
 
   protected footerLinkClass(): string {
     const base =
-      '!w-full !justify-start !rounded-xl !border-0 !px-3 !py-2 !shadow-none !bg-transparent !text-muted-color hover:!bg-emphasis hover:!text-color transition-colors';
+      'sidebar-footer-btn !w-full !justify-start !rounded-xl !border-0 !px-3 !py-2 !shadow-none !bg-transparent !text-muted-color hover:!bg-emphasis hover:!text-color transition-colors';
     return this.sidebar.collapsed() ? `${base} !px-2 !justify-center` : base;
   }
 
@@ -276,11 +257,6 @@ export class SidebarComponent {
     const base =
       '!w-full !justify-start !rounded-xl !border !border-surface !p-2.5 !shadow-none hover:!border-surface hover:!bg-surface-200 dark:hover:!bg-surface-700 transition-colors';
     return this.sidebar.collapsed() ? `${base} !justify-center` : base;
-  }
-
-  protected navigateTo(item: NavItem): void {
-    void this.router.navigate([item.route]);
-    this.onNavigate();
   }
 
   protected onNavigate(): void {

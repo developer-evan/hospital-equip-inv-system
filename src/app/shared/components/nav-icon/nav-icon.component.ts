@@ -45,7 +45,7 @@ const ICON_PATHS: Record<NavIconName, string> = {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       class="size-5 shrink-0 transition-colors"
-      [class.text-orange-500]="active()"
+      [class.text-primary]="active()"
       [class.text-muted-color]="!active()"
       fill="none"
       viewBox="0 0 24 24"

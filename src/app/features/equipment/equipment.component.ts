@@ -75,7 +75,7 @@ interface SelectOption<T = string> {
           type="button"
           icon="pi pi-plus"
           label="New Equipment"
-          styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+          styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           (onClick)="openCreateDialog()"
         />
       }
@@ -158,7 +158,7 @@ interface SelectOption<T = string> {
         <ng-template #body let-item>
           <tr>
             <td>
-              <span class="font-mono text-xs font-medium text-orange-300/90">{{
+              <span class="font-mono text-xs font-medium text-primary-300/90">{{
                 item.assetNumber || '—'
               }}</span>
             </td>
@@ -449,7 +449,7 @@ interface SelectOption<T = string> {
             icon="pi pi-check"
             [loading]="saving()"
             [disabled]="form.invalid || saving()"
-            styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+            styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           />
         </div>
       </form>

@@ -60,7 +60,7 @@ interface SelectOption {
           type="button"
           icon="pi pi-inbox"
           label="Register Equipment"
-          styleClass="!rounded-xl !border-orange-500 !bg-orange-500 hover:!border-orange-400 hover:!bg-orange-400"
+          styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast hover:!border-primary-emphasis hover:!bg-primary-emphasis"
           (onClick)="openRegisterDialog()"
         />
       }
@@ -98,7 +98,7 @@ interface SelectOption {
         </ng-template>
         <ng-template #body let-item>
           <tr>
-            <td><span class="font-mono text-xs text-orange-300/90">{{ item.assetNumber }}</span></td>
+            <td><span class="font-mono text-xs text-primary-300/90">{{ item.assetNumber }}</span></td>
             <td>
               <p class="font-medium text-color">{{ item.name }}</p>
               <p class="text-xs text-muted-color">{{ item.manufacturer }} · SN {{ item.serialNumber }}</p>
@@ -112,7 +112,7 @@ interface SelectOption {
                   label="Confirm"
                   icon="pi pi-check"
                   size="small"
-                  styleClass="!rounded-lg !border-emerald-500/30 !bg-emerald-500/15 !text-emerald-300"
+                  styleClass="!rounded-lg !border-primary/30 !bg-primary/15 !text-primary-300"
                   (onClick)="openConfirmDialog(item)"
                 />
               </td>

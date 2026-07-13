@@ -69,6 +69,59 @@ html:not(.app-dark) {
   height: 100% !important;
 }
 
+/* Sidebar navigation links — plain anchors avoid PrimeNG button focus rings on refresh */
+.sidebar-nav-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  font: inherit;
+  text-decoration: none;
+  color: var(--p-text-muted-color);
+  background: transparent;
+  outline: none !important;
+  box-shadow: none !important;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--p-content-hover-background);
+  color: var(--p-text-color);
+}
+
+.sidebar-nav-item.sidebar-nav-active {
+  background: var(--p-content-hover-background);
+  color: var(--p-text-color);
+}
+
+.sidebar-nav-item:focus,
+.sidebar-nav-item:focus-visible,
+.sidebar-nav-item:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.sidebar-nav-item--collapsed {
+  justify-content: center;
+  padding-inline: 0.5rem;
+}
+
+/* Sidebar footer buttons — suppress misleading focus ring */
+.sidebar-footer-btn.p-button:focus,
+.sidebar-footer-btn.p-button.p-focus,
+.sidebar-footer-btn.p-button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
 /* PrimeNG form fields — use component theme tokens for readable light/dark input text */
 .p-inputtext,
 .p-textarea,

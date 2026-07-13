@@ -16,7 +16,7 @@ interface PageData {
     <div class="flex min-h-[60vh] items-center justify-center">
       <div class="flex max-w-sm flex-col items-center text-center">
         <div
-          class="flex size-16 items-center justify-center rounded-2xl border border-surface text-orange-400"
+          class="flex size-16 items-center justify-center rounded-2xl border border-surface text-primary-400"
         >
           <i [class]="(data()?.['icon'] ?? 'pi pi-sparkles') + ' text-2xl'"></i>
         </div>
