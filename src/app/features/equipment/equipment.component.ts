@@ -64,8 +64,8 @@ interface SelectOption<T = string> {
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Equipment</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-xl font-semibold text-color">Equipment</h2>
+        <p class="mt-1 text-sm text-muted-color">
           Browse, register and track assets across your facility.
         </p>
       </div>
@@ -81,7 +81,7 @@ interface SelectOption<T = string> {
       }
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table
         [value]="equipment()"
         [loading]="loading()"
@@ -100,8 +100,8 @@ interface SelectOption<T = string> {
           <div class="flex flex-col gap-3">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p class="text-sm font-medium text-slate-200">All equipment</p>
-                <p class="text-xs text-slate-500">{{ totalRecords() }} total assets</p>
+                <p class="text-sm font-medium text-color">All equipment</p>
+                <p class="text-xs text-muted-color">{{ totalRecords() }} total assets</p>
               </div>
 
               <p-iconfield iconPosition="left" class="w-full sm:w-72">
@@ -110,7 +110,7 @@ interface SelectOption<T = string> {
                   pInputText
                   type="search"
                   placeholder="Search name, category, manufacturer…"
-                  class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2 !text-sm !text-slate-100 placeholder:!text-slate-500"
+                  class="w-full !rounded-xl !border-surface !py-2 !text-sm"
                   [value]="searchInput()"
                   (input)="onSearchInput($event)"
                 />
@@ -164,8 +164,8 @@ interface SelectOption<T = string> {
             </td>
             <td>
               <div class="min-w-0">
-                <p class="truncate font-medium text-slate-200">{{ item.name }}</p>
-                <p class="truncate text-xs text-slate-500">
+                <p class="truncate font-medium text-color">{{ item.name }}</p>
+                <p class="truncate text-xs text-muted-color">
                   {{ item.manufacturer
                   }}{{ item.model ? ' · ' + item.model : '' }}
                   · SN {{ item.serialNumber }}
@@ -173,10 +173,10 @@ interface SelectOption<T = string> {
               </div>
             </td>
             <td>
-              <span class="text-sm text-slate-400">{{ item.category }}</span>
+              <span class="text-sm text-muted-color">{{ item.category }}</span>
             </td>
             <td>
-              <span class="text-sm text-slate-400">{{ departmentLabel(item) }}</span>
+              <span class="text-sm text-muted-color">{{ departmentLabel(item) }}</span>
             </td>
             <td>
               <app-status-badge [status]="item.status" />
@@ -191,7 +191,7 @@ interface SelectOption<T = string> {
                       [rounded]="true"
                       [text]="true"
                       severity="secondary"
-                      styleClass="!size-8 !text-slate-500 hover:!text-slate-300"
+                      styleClass="!size-8 !text-muted-color hover:!text-color"
                       pTooltip="Edit equipment"
                       tooltipPosition="left"
                       (onClick)="openEditDialog(item)"
@@ -204,7 +204,7 @@ interface SelectOption<T = string> {
                       [rounded]="true"
                       [text]="true"
                       severity="danger"
-                      styleClass="!size-8 !text-slate-500 hover:!text-rose-400"
+                      styleClass="!size-8 !text-muted-color hover:!text-rose-400"
                       pTooltip="Delete equipment"
                       tooltipPosition="left"
                       (onClick)="confirmDelete(item)"
@@ -221,13 +221,13 @@ interface SelectOption<T = string> {
             <td [attr.colspan]="canEdit() || canDelete() ? 6 : 5">
               <div class="flex flex-col items-center justify-center gap-3 py-14 text-center">
                 <span
-                  class="flex size-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-slate-500"
+                  class="flex size-12 items-center justify-center rounded-2xl border border-surface text-muted-color"
                 >
                   <i class="pi pi-box text-xl"></i>
                 </span>
                 <div>
-                  <p class="text-sm font-medium text-slate-300">No equipment found</p>
-                  <p class="mt-1 text-xs text-slate-500">
+                  <p class="text-sm font-medium text-color">No equipment found</p>
+                  <p class="mt-1 text-xs text-muted-color">
                     Try adjusting filters or register a new asset.
                   </p>
                 </div>
@@ -255,64 +255,64 @@ interface SelectOption<T = string> {
       <form [formGroup]="form" (ngSubmit)="saveEquipment()" class="flex flex-col gap-4">
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="eqName" class="text-sm font-medium text-slate-300">Name</label>
+            <label for="eqName" class="text-sm font-medium text-color">Name</label>
             <input
               pInputText
               id="eqName"
               formControlName="name"
               placeholder="Patient Monitor"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqCategory" class="text-sm font-medium text-slate-300">Category</label>
+            <label for="eqCategory" class="text-sm font-medium text-color">Category</label>
             <input
               pInputText
               id="eqCategory"
               formControlName="category"
               placeholder="Monitoring"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqManufacturer" class="text-sm font-medium text-slate-300">Manufacturer</label>
+            <label for="eqManufacturer" class="text-sm font-medium text-color">Manufacturer</label>
             <input
               pInputText
               id="eqManufacturer"
               formControlName="manufacturer"
               placeholder="Philips"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqModel" class="text-sm font-medium text-slate-300">
-              Model <span class="text-slate-600">(optional)</span>
+            <label for="eqModel" class="text-sm font-medium text-color">
+              Model <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
               id="eqModel"
               formControlName="model"
               placeholder="MX450"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqSerial" class="text-sm font-medium text-slate-300">Serial number</label>
+            <label for="eqSerial" class="text-sm font-medium text-color">Serial number</label>
             <input
               pInputText
               id="eqSerial"
               formControlName="serialNumber"
               placeholder="SN-2024-001"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="eqDepartment" class="text-sm font-medium text-slate-300">Department</label>
+            <label for="eqDepartment" class="text-sm font-medium text-color">Department</label>
             <p-select
               inputId="eqDepartment"
               formControlName="department"
@@ -326,46 +326,46 @@ interface SelectOption<T = string> {
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqRoom" class="text-sm font-medium text-slate-300">
-              Room location <span class="text-slate-600">(optional)</span>
+            <label for="eqRoom" class="text-sm font-medium text-color">
+              Room location <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
               id="eqRoom"
               formControlName="roomLocation"
               placeholder="ICU Bay 3"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqSupplier" class="text-sm font-medium text-slate-300">
-              Supplier <span class="text-slate-600">(optional)</span>
+            <label for="eqSupplier" class="text-sm font-medium text-color">
+              Supplier <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
               id="eqSupplier"
               formControlName="supplier"
               placeholder="MedSupply Co."
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqPurchaseDate" class="text-sm font-medium text-slate-300">
-              Purchase date <span class="text-slate-600">(optional)</span>
+            <label for="eqPurchaseDate" class="text-sm font-medium text-color">
+              Purchase date <span class="text-muted-color">(optional)</span>
             </label>
             <input
               id="eqPurchaseDate"
               type="date"
               formControlName="purchaseDate"
-              class="w-full rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100"
+              class="w-full rounded-xl border border-surface px-3 py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqCost" class="text-sm font-medium text-slate-300">
-              Cost <span class="text-slate-600">(optional)</span>
+            <label for="eqCost" class="text-sm font-medium text-color">
+              Cost <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
@@ -375,37 +375,37 @@ interface SelectOption<T = string> {
               step="0.01"
               formControlName="cost"
               placeholder="0.00"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqWarrantyStart" class="text-sm font-medium text-slate-300">
-              Warranty start <span class="text-slate-600">(optional)</span>
+            <label for="eqWarrantyStart" class="text-sm font-medium text-color">
+              Warranty start <span class="text-muted-color">(optional)</span>
             </label>
             <input
               id="eqWarrantyStart"
               type="date"
               formControlName="warrantyStartDate"
-              class="w-full rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100"
+              class="w-full rounded-xl border border-surface px-3 py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqWarrantyEnd" class="text-sm font-medium text-slate-300">
-              Warranty end <span class="text-slate-600">(optional)</span>
+            <label for="eqWarrantyEnd" class="text-sm font-medium text-color">
+              Warranty end <span class="text-muted-color">(optional)</span>
             </label>
             <input
               id="eqWarrantyEnd"
               type="date"
               formControlName="warrantyEndDate"
-              class="w-full rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100"
+              class="w-full rounded-xl border border-surface px-3 py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqPmDays" class="text-sm font-medium text-slate-300">
-              PM frequency (days) <span class="text-slate-600">(optional)</span>
+            <label for="eqPmDays" class="text-sm font-medium text-color">
+              PM frequency (days) <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
@@ -414,13 +414,13 @@ interface SelectOption<T = string> {
               min="1"
               formControlName="pmFrequencyDays"
               placeholder="90"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="eqCalDays" class="text-sm font-medium text-slate-300">
-              Calibration frequency (days) <span class="text-slate-600">(optional)</span>
+            <label for="eqCalDays" class="text-sm font-medium text-color">
+              Calibration frequency (days) <span class="text-muted-color">(optional)</span>
             </label>
             <input
               pInputText
@@ -429,18 +429,18 @@ interface SelectOption<T = string> {
               min="1"
               formControlName="calibrationFrequencyDays"
               placeholder="365"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
         </div>
 
-        <div class="mt-2 flex justify-end gap-2 border-t border-white/5 pt-4">
+        <div class="mt-2 flex justify-end gap-2 border-t border-surface pt-4">
           <p-button
             type="button"
             label="Cancel"
             [text]="true"
             severity="secondary"
-            styleClass="!text-slate-400"
+            styleClass="!text-muted-color"
             (onClick)="closeDialog()"
           />
           <p-button

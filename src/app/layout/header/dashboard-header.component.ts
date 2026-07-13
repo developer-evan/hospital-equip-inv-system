@@ -11,13 +11,14 @@ import { StoreContextService } from '../../core/services/store-context.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ROLE_LABEL } from '../../core/models/role.enum';
 import { SidebarStateService } from '../services/sidebar-state.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-dashboard-header',
   imports: [Button, Avatar, TooltipModule],
   host: {
     class:
-      'sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-white/5 bg-[#0a0b0f]/90 px-4 backdrop-blur-md md:h-[4.25rem] md:px-5',
+      'sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-surface bg-surface-50/90 dark:bg-surface-950/90 px-4 backdrop-blur-md md:h-[4.25rem] md:px-5',
   },
   template: `
     <!-- Mobile hamburger -->
@@ -27,7 +28,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       [rounded]="true"
       [text]="true"
       severity="secondary"
-      styleClass="!text-slate-300 hover:!text-white hover:!bg-slate-700 lg:!hidden"
+      styleClass="!text-muted-color hover:!text-color hover:!bg-emphasis lg:!hidden"
       ariaLabel="Open navigation menu"
       (onClick)="sidebar.toggleMobile()"
     />
@@ -39,16 +40,16 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       [rounded]="true"
       [text]="true"
       severity="secondary"
-      styleClass="!hidden !size-9 !text-slate-400 hover:!text-white hover:!bg-slate-700 lg:!inline-flex"
+      styleClass="!hidden !size-9 !text-muted-color hover:!text-color hover:!bg-emphasis lg:!inline-flex"
       [ariaLabel]="sidebar.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
       (onClick)="sidebar.toggleCollapsed()"
     />
 
     <div class="min-w-0 flex-1">
-      <p class="truncate text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+      <p class="truncate text-[10px] font-semibold uppercase tracking-widest text-muted-color">
         Dashboard
       </p>
-      <h1 class="truncate text-base font-semibold text-white md:text-lg">
+      <h1 class="truncate text-base font-semibold text-color md:text-lg">
         {{ pageTitle() }}
       </h1>
     </div>
@@ -56,27 +57,40 @@ import { SidebarStateService } from '../services/sidebar-state.service';
     <div class="flex items-center gap-2">
       <p-button
         type="button"
+        [icon]="theme.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        styleClass="!text-muted-color hover:!text-color"
+        [ariaLabel]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+        [pTooltip]="theme.isDark() ? 'Light mode' : 'Dark mode'"
+        tooltipPosition="bottom"
+        (onClick)="theme.toggle()"
+      />
+
+      <p-button
+        type="button"
         icon="pi pi-bell"
         [rounded]="true"
         [text]="true"
         severity="secondary"
-        styleClass="!text-slate-400 hover:!text-white"
+        styleClass="!text-muted-color hover:!text-color"
         ariaLabel="Notifications"
         pTooltip="Notifications"
         tooltipPosition="bottom"
       />
 
-      <span class="hidden h-6 w-px bg-white/10 sm:block"></span>
+      <span class="hidden h-6 w-px bg-surface-200 dark:bg-surface-700 sm:block"></span>
 
       <div class="hidden items-center gap-2 sm:flex">
         <p-avatar
           [label]="userInitials()"
           shape="circle"
-          styleClass="!size-8 !bg-orange-500/20 !text-xs !font-semibold !text-orange-300"
+          styleClass="!size-8 !bg-primary/20 !text-xs !font-semibold !text-primary"
         />
         <div class="min-w-0 text-left">
-          <p class="truncate text-sm font-medium text-white">{{ user()?.fullName }}</p>
-          <p class="truncate text-xs text-slate-500">{{ roleLabel() }}</p>
+          <p class="truncate text-sm font-medium text-color">{{ user()?.fullName }}</p>
+          <p class="truncate text-xs text-muted-color">{{ roleLabel() }}</p>
         </div>
       </div>
 
@@ -86,7 +100,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
         [rounded]="true"
         [text]="true"
         severity="secondary"
-        styleClass="!text-slate-400 hover:!text-rose-400"
+        styleClass="!text-muted-color hover:!text-rose-400"
         ariaLabel="Sign out"
         pTooltip="Sign out"
         tooltipPosition="bottom"
@@ -100,6 +114,7 @@ export class DashboardHeaderComponent {
   protected readonly sidebar = inject(SidebarStateService);
   protected readonly storeContext = inject(StoreContextService);
   protected readonly auth = inject(AuthService);
+  protected readonly theme = inject(ThemeService);
 
   protected readonly user = this.auth.currentUser;
 

@@ -16,14 +16,14 @@ interface PageData {
     <div class="flex min-h-[60vh] items-center justify-center">
       <div class="flex max-w-sm flex-col items-center text-center">
         <div
-          class="flex size-16 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-orange-400"
+          class="flex size-16 items-center justify-center rounded-2xl border border-surface text-orange-400"
         >
           <i [class]="(data()?.['icon'] ?? 'pi pi-sparkles') + ' text-2xl'"></i>
         </div>
-        <h2 class="mt-5 text-lg font-semibold text-white">
+        <h2 class="mt-5 text-lg font-semibold text-color">
           {{ data()?.['title'] ?? 'Coming soon' }}
         </h2>
-        <p class="mt-2 text-sm leading-relaxed text-slate-500">
+        <p class="mt-2 text-sm leading-relaxed text-muted-color">
           {{ data()?.['description'] ?? 'This module is on the roadmap and will follow the same patterns as the rest of the app.' }}
         </p>
       </div>

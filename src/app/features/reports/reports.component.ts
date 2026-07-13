@@ -31,26 +31,26 @@ interface ReportItem {
   imports: [FormsModule, Button, InputText, Select, SelectButton, Card],
   template: `
     <div class="mb-6">
-      <h2 class="text-xl font-semibold text-white">Reports</h2>
-      <p class="mt-1 text-sm text-slate-500">Export hospital-wide inventory and maintenance reports.</p>
+      <h2 class="text-xl font-semibold text-color">Reports</h2>
+      <p class="mt-1 text-sm text-muted-color">Export hospital-wide inventory and maintenance reports.</p>
     </div>
 
-    <p-card styleClass="!mb-6 !rounded-2xl !border-white/5 !bg-[#111319]">
+    <p-card styleClass="!mb-6 !rounded-2xl !border-surface !bg-surface-0 dark:bg-surface-900">
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <p-select [options]="departmentOptions()" [(ngModel)]="filter.department" optionLabel="label" optionValue="value" placeholder="All departments" [showClear]="true" styleClass="w-full !rounded-xl" />
         <p-select [options]="statusOptions" [(ngModel)]="filter.status" optionLabel="label" optionValue="value" placeholder="All statuses" [showClear]="true" styleClass="w-full !rounded-xl" />
-        <input type="date" [(ngModel)]="filter.from" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
-        <input type="date" [(ngModel)]="filter.to" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
-        <input pInputText [(ngModel)]="filter.engineer" placeholder="Engineer ID (optional)" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
+        <input type="date" [(ngModel)]="filter.from" class="rounded-xl border border-surface px-3 py-2.5" />
+        <input type="date" [(ngModel)]="filter.to" class="rounded-xl border border-surface px-3 py-2.5" />
+        <input pInputText [(ngModel)]="filter.engineer" placeholder="Engineer ID (optional)" class="rounded-xl border border-surface px-3 py-2.5" />
         <p-selectbutton [options]="formatOptions" [(ngModel)]="filter.format" optionLabel="label" optionValue="value" styleClass="w-full" />
       </div>
     </p-card>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (report of reports; track report.key) {
-        <div class="rounded-2xl border border-white/5 bg-[#111319] p-5">
-          <h3 class="font-medium text-slate-200">{{ report.label }}</h3>
-          <p class="mt-1 text-sm text-slate-500">{{ report.description }}</p>
+        <div class="rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900 p-5">
+          <h3 class="font-medium text-color">{{ report.label }}</h3>
+          <p class="mt-1 text-sm text-muted-color">{{ report.description }}</p>
           <p-button
             type="button"
             icon="pi pi-download"

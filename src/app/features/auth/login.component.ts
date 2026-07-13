@@ -17,10 +17,10 @@ import { ApiErrorBody } from '../../core/models/common.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, Button, Card, Checkbox, InputText, Password, Message],
   template: `
-    <div class="flex min-h-dvh bg-[#0a0b0f] text-slate-100">
+    <div class="flex min-h-dvh bg-surface-50 dark:bg-surface-950 text-color">
       <!-- Brand panel -->
       <div
-        class="relative hidden w-[45%] flex-col justify-between overflow-hidden border-r border-white/5 bg-[#111319] p-10 lg:flex"
+        class="relative hidden w-[45%] flex-col justify-between overflow-hidden border-r border-surface bg-surface-0 dark:bg-surface-900 p-10 lg:flex"
       >
         <div class="relative z-10">
           <div class="flex items-center gap-3">
@@ -29,21 +29,21 @@ import { ApiErrorBody } from '../../core/models/common.model';
             >
               <i class="pi pi-heart-fill"></i>
             </div>
-            <span class="text-xl font-semibold tracking-tight text-white">MediTrack</span>
+            <span class="text-xl font-semibold tracking-tight text-color">MediTrack</span>
           </div>
         </div>
 
         <div class="relative z-10 max-w-md">
-          <h1 class="text-3xl font-semibold leading-tight text-white">
+          <h1 class="text-3xl font-semibold leading-tight text-color">
             Hospital equipment inventory, simplified.
           </h1>
-          <p class="mt-4 text-sm leading-relaxed text-slate-400">
+          <p class="mt-4 text-sm leading-relaxed text-muted-color">
             Track assets, maintenance schedules and receiving workflows across every department
             — all in one place.
           </p>
         </div>
 
-        <p class="relative z-10 text-xs text-slate-600">
+        <p class="relative z-10 text-xs text-muted-color">
           &copy; {{ currentYear }} MediTrack &middot; Hospital Equipment Inventory System
         </p>
 
@@ -67,15 +67,15 @@ import { ApiErrorBody } from '../../core/models/common.model';
               >
                 <i class="pi pi-heart-fill"></i>
               </div>
-              <span class="text-xl font-semibold text-white">MediTrack</span>
+              <span class="text-xl font-semibold text-color">MediTrack</span>
             </div>
           </div>
 
           <p-card styleClass="auth-card">
             <ng-template #header>
               <div class="px-1 pt-1">
-                <h2 class="text-2xl font-semibold text-white">Welcome back</h2>
-                <p class="mt-1 text-sm text-slate-500">Sign in to access your dashboard</p>
+                <h2 class="text-2xl font-semibold text-color">Welcome back</h2>
+                <p class="mt-1 text-sm text-muted-color">Sign in to access your dashboard</p>
               </div>
             </ng-template>
 
@@ -85,19 +85,19 @@ import { ApiErrorBody } from '../../core/models/common.model';
 
             <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
               <div class="flex flex-col gap-1.5">
-                <label for="username" class="text-sm font-medium text-slate-300">Username</label>
+                <label for="username" class="text-sm font-medium text-color">Username</label>
                 <input
                   pInputText
                   id="username"
                   formControlName="username"
                   placeholder="Enter your username"
                   autocomplete="username"
-                  class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+                  class="w-full !rounded-xl !border-surface !py-2.5"
                 />
               </div>
 
               <div class="flex flex-col gap-1.5">
-                <label for="password" class="text-sm font-medium text-slate-300">Password</label>
+                <label for="password" class="text-sm font-medium text-color">Password</label>
                 <p-password
                   inputId="password"
                   formControlName="password"
@@ -106,13 +106,13 @@ import { ApiErrorBody } from '../../core/models/common.model';
                   [feedback]="false"
                   autocomplete="current-password"
                   styleClass="w-full"
-                  inputStyleClass="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+                  inputStyleClass="w-full !rounded-xl !border-surface !py-2.5"
                 />
               </div>
 
               <div class="flex items-center gap-2">
                 <p-checkbox formControlName="rememberMe" [binary]="true" inputId="rememberMe" />
-                <label for="rememberMe" class="cursor-pointer text-sm text-slate-400">
+                <label for="rememberMe" class="cursor-pointer text-sm text-muted-color">
                   Remember me
                 </label>
               </div>

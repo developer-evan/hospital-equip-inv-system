@@ -8,6 +8,17 @@ export interface DashboardSummary {
   decommissioned: number;
   pmDueThisMonth: number;
   receivedToday: number;
+  byDepartment?: DepartmentBreakdownItem[];
+  weeklyActivity?: WeeklyActivityPoint[];
+  operationalHealth?: OperationalHealthMetric[];
+  recentActivity?: RecentActivityRow[];
+}
+
+export interface DepartmentBreakdownItem {
+  departmentId?: string;
+  department?: string;
+  name?: string;
+  count: number;
 }
 
 export interface WeeklyActivityPoint {
@@ -27,9 +38,9 @@ export interface KpiTrend {
   label: string;
   value: string;
   icon: string;
-  deltaPercent: number;
-  trend: 'up' | 'down';
-  comparisonLabel: string;
+  deltaPercent?: number;
+  trend?: 'up' | 'down';
+  comparisonLabel?: string;
 }
 
 export interface RecentActivityRow {

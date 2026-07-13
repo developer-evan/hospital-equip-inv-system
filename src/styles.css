@@ -4,8 +4,9 @@
 
 @import 'tailwindcss/theme.css' layer(tailwind-base);
 @import 'tailwindcss/utilities.css' layer(tailwind-utilities);
+@import 'tailwindcss-primeui';
 
-@plugin 'tailwindcss-primeui';
+@custom-variant dark (&:where(.app-dark, .app-dark *));
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -15,17 +16,27 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background-color: #0a0b0f;
-  color: #e2e8f0;
+  background-color: var(--p-surface-50);
+  color: var(--p-text-color);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.app-dark,
+html.app-dark body {
+  background-color: var(--p-surface-950);
+  color-scheme: dark;
+}
+
+html:not(.app-dark) {
+  color-scheme: light;
+}
+
 /* Slim scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  scrollbar-color: color-mix(in srgb, var(--p-text-color) 12%, transparent) transparent;
 }
 *::-webkit-scrollbar {
   width: 5px;
@@ -35,11 +46,11 @@ body {
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: color-mix(in srgb, var(--p-text-color) 12%, transparent);
   border-radius: 999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.14);
+  background-color: color-mix(in srgb, var(--p-text-color) 20%, transparent);
 }
 
 /* PrimeNG ScrollPanel — zero out its default styling so the sidebar fills naturally */
@@ -48,7 +59,7 @@ body {
   overflow-x: hidden !important;
 }
 .p-scrollpanel-bar {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: color-mix(in srgb, var(--p-text-color) 8%, transparent) !important;
 }
 
 /* PrimeNG Drawer — clear default padding so our sidebar component owns its own layout */
@@ -58,12 +69,86 @@ body {
   height: 100% !important;
 }
 
-/* PrimeNG InputText baseline */
-.p-inputtext {
+/* PrimeNG form fields — use component theme tokens for readable light/dark input text */
+.p-inputtext,
+.p-textarea,
+textarea,
+input[type='date'],
+input[type='datetime-local'],
+input[type='time'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='search'],
+input[type='text'],
+.p-password-input {
+  background: var(--p-inputtext-background) !important;
+  border-color: var(--p-inputtext-border-color) !important;
+  color: var(--p-inputtext-color) !important;
   font-family: inherit;
 }
 
-/* Dashboard table — dark PrimeNG datatable */
+.p-inputtext::placeholder,
+textarea::placeholder,
+.p-password-input::placeholder {
+  color: var(--p-inputtext-placeholder-color) !important;
+}
+
+.p-inputtext:enabled:hover,
+textarea:enabled:hover,
+input[type='date']:enabled:hover,
+.p-password-input:enabled:hover {
+  border-color: var(--p-inputtext-hover-border-color) !important;
+}
+
+.p-inputtext:enabled:focus,
+textarea:enabled:focus,
+input[type='date']:enabled:focus,
+.p-password-input:enabled:focus {
+  border-color: var(--p-inputtext-focus-border-color) !important;
+  box-shadow: var(--p-inputtext-focus-ring-shadow, none);
+}
+
+.p-select,
+.p-multiselect {
+  background: var(--p-select-background) !important;
+  border-color: var(--p-select-border-color) !important;
+  color: var(--p-select-color) !important;
+}
+
+.p-select:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled):hover {
+  border-color: var(--p-select-hover-border-color) !important;
+}
+
+.p-select:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus {
+  border-color: var(--p-select-focus-border-color) !important;
+  box-shadow: var(--p-select-focus-ring-shadow, none);
+}
+
+.p-select .p-select-label {
+  color: var(--p-select-color) !important;
+}
+
+.p-select .p-select-label.p-placeholder {
+  color: var(--p-select-placeholder-color) !important;
+}
+
+html.app-dark input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+}
+
+.p-select-overlay,
+.p-select-list-container,
+.p-multiselect-overlay,
+.p-multiselect-list-container {
+  background: var(--p-select-overlay-background) !important;
+  border-color: var(--p-select-overlay-border-color) !important;
+  color: var(--p-select-overlay-color) !important;
+}
+
+/* Dashboard table — PrimeNG token-aware datatable */
 .dashboard-table.p-datatable {
   background: transparent;
 }
@@ -71,7 +156,7 @@ body {
 .dashboard-table.p-datatable .p-datatable-header {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--p-content-border-color);
   padding: 1rem 1.25rem;
 }
 
@@ -80,10 +165,10 @@ body {
 }
 
 .dashboard-table.p-datatable .p-datatable-thead > tr > th {
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--p-content-background) 92%, var(--p-text-color));
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #64748b;
+  border-bottom: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -92,18 +177,18 @@ body {
 }
 
 .dashboard-table.p-datatable .p-datatable-thead > tr > th.p-datatable-column-sorted {
-  background: rgba(249, 115, 22, 0.06);
-  color: #fdba74;
+  background: var(--p-highlight-background);
+  color: var(--p-highlight-color);
 }
 
 .dashboard-table.p-datatable .p-datatable-sort-icon,
 .dashboard-table.p-datatable .p-sortable-column-icon {
-  color: #64748b;
+  color: var(--p-text-muted-color);
   font-size: 0.75rem;
 }
 
 .dashboard-table.p-datatable .p-datatable-thead > tr > th.p-datatable-column-sorted .p-datatable-sort-icon {
-  color: #fb923c;
+  color: var(--p-primary-color);
 }
 
 .dashboard-table.p-datatable .p-datatable-tbody > tr {
@@ -113,12 +198,12 @@ body {
 
 .dashboard-table.p-datatable .p-datatable-tbody > tr:hover,
 .dashboard-table.p-datatable .p-datatable-tbody > tr.p-datatable-row-hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--p-content-hover-background);
 }
 
 .dashboard-table.p-datatable .p-datatable-tbody > tr > td {
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--p-content-border-color);
   padding: 0.9rem 1.25rem;
   vertical-align: middle;
 }
@@ -136,8 +221,8 @@ body {
 .dashboard-paginator.p-paginator {
   background: transparent;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+  border-top: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
   padding: 0.75rem 1.25rem;
 }
 
@@ -146,16 +231,16 @@ body {
 .dashboard-paginator.p-paginator .p-paginator-prev,
 .dashboard-paginator.p-paginator .p-paginator-next,
 .dashboard-paginator.p-paginator .p-paginator-last {
-  color: #94a3b8;
+  color: var(--p-text-muted-color);
   min-width: 2rem;
   height: 2rem;
   border-radius: 0.5rem;
 }
 
 .dashboard-paginator.p-paginator .p-paginator-page.p-paginator-page-selected {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.25);
-  color: #fdba74;
+  background: var(--p-highlight-background);
+  border-color: var(--p-highlight-border-color, transparent);
+  color: var(--p-highlight-color);
 }
 
 .dashboard-paginator.p-paginator .p-paginator-page:not(.p-disabled):hover,
@@ -163,13 +248,13 @@ body {
 .dashboard-paginator.p-paginator .p-paginator-prev:not(.p-disabled):hover,
 .dashboard-paginator.p-paginator .p-paginator-next:not(.p-disabled):hover,
 .dashboard-paginator.p-paginator .p-paginator-last:not(.p-disabled):hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  background: var(--p-content-hover-background);
+  color: var(--p-text-color);
 }
 
 .dashboard-paginator.p-paginator .p-select {
-  border-color: rgba(255, 255, 255, 0.1);
-  background: #1a1d26;
+  border-color: var(--p-content-border-color);
+  background: var(--p-content-background);
 }
 
 /* Toolbar buttons — icon-only on small screens */
@@ -184,10 +269,8 @@ body {
   }
 }
 
-/* Auth login card */
+/* Auth login card — structural only; colors come from PrimeNG Card theme */
 .auth-card.p-card {
-  background: #111319;
-  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 1rem;
   box-shadow: none;
 }
@@ -213,66 +296,23 @@ body {
   border: none;
 }
 
-/* App dialog — dark modal surface (form + confirm) */
+/* App dialog — structural polish; surfaces from PrimeNG theme */
 .app-dialog.p-dialog,
-.p-confirmdialog.app-dialog,
-.p-confirmdialog {
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+.p-confirmdialog.app-dialog {
   border-radius: 1rem !important;
-  background: #111319 !important;
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45) !important;
-  color: #e2e8f0 !important;
 }
 
 .app-dialog.p-dialog .p-dialog-header,
-.p-confirmdialog.app-dialog .p-dialog-header,
-.p-confirmdialog .p-dialog-header {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  color: #f8fafc !important;
+.p-confirmdialog.app-dialog .p-dialog-header {
   padding: 1.25rem 1.5rem !important;
 }
 
 .app-dialog.p-dialog .p-dialog-content,
-.p-confirmdialog.app-dialog .p-dialog-content,
-.p-confirmdialog .p-dialog-content {
-  background: transparent !important;
-  color: #cbd5e1 !important;
+.p-confirmdialog.app-dialog .p-dialog-content {
   padding: 1.25rem 1.5rem !important;
 }
 
 .app-dialog.p-dialog .p-dialog-footer,
-.p-confirmdialog.app-dialog .p-dialog-footer,
-.p-confirmdialog .p-dialog-footer {
-  background: transparent !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+.p-confirmdialog.app-dialog .p-dialog-footer {
   padding: 1rem 1.5rem 1.25rem !important;
 }
-
-.app-dialog.p-dialog .p-dialog-header-actions .p-button,
-.p-confirmdialog .p-dialog-header-actions .p-button {
-  color: #94a3b8 !important;
-}
-
-.p-confirmdialog .p-confirmdialog-icon {
-  color: #fbbf24 !important;
-}
-
-.p-confirmdialog .p-confirmdialog-message {
-  color: #cbd5e1 !important;
-}
-
-.p-dialog-mask,
-.p-overlay-mask {
-  background: rgba(0, 0, 0, 0.65) !important;
-}
-
-/* Dark tooltips */
-.p-tooltip .p-tooltip-text {
-  background: #1a1d26;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
-  font-size: 0.75rem;
-  padding: 0.375rem 0.625rem;
-}
-

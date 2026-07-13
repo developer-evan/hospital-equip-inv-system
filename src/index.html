@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="app-dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>MediTrack &mdash; Hospital Equipment Inventory System</title>
@@ -9,6 +9,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var isLight = localStorage.getItem('heims_theme') === 'light';
+        var root = document.documentElement;
+        if (isLight) {
+          root.classList.remove('app-dark');
+          root.style.colorScheme = 'light';
+        } else {
+          root.classList.add('app-dark');
+          root.style.colorScheme = 'dark';
+        }
+      } catch (e) {
+        document.documentElement.classList.add('app-dark');
+        document.documentElement.style.colorScheme = 'dark';
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

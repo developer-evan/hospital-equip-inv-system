@@ -57,20 +57,20 @@ interface SelectOption<T = string> {
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Maintenance</h2>
-        <p class="mt-1 text-sm text-slate-500">Schedule and complete preventive, corrective and calibration work.</p>
+        <h2 class="text-xl font-semibold text-color">Maintenance</h2>
+        <p class="mt-1 text-sm text-muted-color">Schedule and complete preventive, corrective and calibration work.</p>
       </div>
       @if (canCreate()) {
         <p-button type="button" icon="pi pi-plus" label="Schedule Maintenance" styleClass="!rounded-xl !border-orange-500 !bg-orange-500" (onClick)="openCreateDialog()" />
       }
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table [value]="records()" [loading]="loading()" [lazy]="true" [paginator]="true" [rows]="pageSize" [totalRecords]="totalRecords()" (onLazyLoad)="onLazyLoad($event)" styleClass="dashboard-table" paginatorStyleClass="dashboard-paginator" [rowHover]="true">
         <ng-template #caption>
           <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div class="flex items-center gap-3">
-              <span class="text-sm text-slate-400">Show overdue only</span>
+              <span class="text-sm text-muted-color">Show overdue only</span>
               <p-toggleswitch [(ngModel)]="overdueOnly" (ngModelChange)="onFiltersChanged()" />
             </div>
             <div class="flex flex-col gap-2 sm:flex-row">
@@ -92,12 +92,12 @@ interface SelectOption<T = string> {
         <ng-template #body let-row>
           <tr>
             <td>
-              <p class="font-medium text-slate-200">{{ equipmentName(row) }}</p>
-              <p class="text-xs text-slate-500">{{ equipmentAsset(row) }}</p>
+              <p class="font-medium text-color">{{ equipmentName(row) }}</p>
+              <p class="text-xs text-muted-color">{{ equipmentAsset(row) }}</p>
             </td>
-            <td class="text-sm text-slate-400">{{ typeLabel(row.type) }}</td>
-            <td class="text-sm text-slate-400">{{ formatDate(row.scheduledDate) }}</td>
-            <td class="text-sm text-slate-400">{{ engineerName(row) }}</td>
+            <td class="text-sm text-muted-color">{{ typeLabel(row.type) }}</td>
+            <td class="text-sm text-muted-color">{{ formatDate(row.scheduledDate) }}</td>
+            <td class="text-sm text-muted-color">{{ engineerName(row) }}</td>
             <td><app-status-badge [status]="row.status" /></td>
             <td class="text-right">
               @if (canComplete(row)) {
@@ -107,7 +107,7 @@ interface SelectOption<T = string> {
           </tr>
         </ng-template>
         <ng-template #emptymessage>
-          <tr><td colspan="6"><div class="py-14 text-center text-sm text-slate-500">No maintenance records found.</div></td></tr>
+          <tr><td colspan="6"><div class="py-14 text-center text-sm text-muted-color">No maintenance records found.</div></td></tr>
         </ng-template>
       </p-table>
     </div>
@@ -117,7 +117,7 @@ interface SelectOption<T = string> {
       <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="flex flex-col gap-4">
         <p-select formControlName="equipment" [options]="equipmentOptions()" optionLabel="label" optionValue="value" placeholder="Equipment *" styleClass="w-full !rounded-xl" />
         <p-select formControlName="type" [options]="typeOptions" optionLabel="label" optionValue="value" placeholder="Type *" styleClass="w-full !rounded-xl" />
-        <input type="date" formControlName="scheduledDate" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
+        <input type="date" formControlName="scheduledDate" class="rounded-xl border border-surface px-3 py-2.5" />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="createVisible = false" />
           <p-button type="submit" label="Schedule" icon="pi pi-check" [loading]="saving()" [disabled]="createForm.invalid || saving()" />
@@ -128,8 +128,8 @@ interface SelectOption<T = string> {
     <p-dialog [(visible)]="completeVisible" header="Complete Maintenance" [modal]="true" [style]="{ width: '28rem', maxWidth: '95vw' }" styleClass="app-dialog">
       @if (formError()) { <p-message severity="error" [text]="formError()!" styleClass="!mb-4 !w-full" /> }
       <form [formGroup]="completeForm" (ngSubmit)="submitComplete()" class="flex flex-col gap-4">
-        <input type="date" formControlName="performedDate" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
-        <textarea formControlName="serviceReport" rows="4" placeholder="Service report *" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100"></textarea>
+        <input type="date" formControlName="performedDate" class="rounded-xl border border-surface px-3 py-2.5" />
+        <textarea formControlName="serviceReport" rows="4" placeholder="Service report *" class="rounded-xl border border-surface px-3 py-2.5"></textarea>
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="completeVisible = false" />
           <p-button type="submit" label="Complete" icon="pi pi-check" [loading]="saving()" [disabled]="completeForm.invalid || saving()" />

@@ -32,12 +32,12 @@ import { SidebarStateService } from '../services/sidebar-state.service';
     NavIconComponent,
   ],
   host: {
-    class: 'flex h-full min-h-0 flex-col bg-[#111319] text-slate-200',
+    class: 'flex h-full min-h-0 flex-col bg-surface-0 dark:bg-surface-900 text-color',
   },
   template: `
     <!-- Brand -->
     <div
-      class="flex shrink-0 items-center gap-3 border-b border-white/5 px-4 py-4"
+      class="flex shrink-0 items-center gap-3 border-b border-surface px-4 py-4"
       [class.justify-center]="sidebar.collapsed()"
       [class.lg:px-3]="sidebar.collapsed()"
     >
@@ -54,7 +54,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       </div>
 
       @if (!sidebar.collapsed()) {
-        <span class="flex-1 text-lg font-semibold tracking-tight text-white">MediTrack</span>
+        <span class="flex-1 text-lg font-semibold tracking-tight text-color">MediTrack</span>
       }
     </div>
 
@@ -63,17 +63,17 @@ import { SidebarStateService } from '../services/sidebar-state.service';
       <div class="shrink-0 px-4 py-4">
         <div class="relative">
           <p-iconfield iconPosition="left" styleClass="w-full">
-            <p-inputicon styleClass="pi pi-search text-slate-500" />
+            <p-inputicon styleClass="pi pi-search text-muted-color" />
             <input
               pInputText
               type="search"
               placeholder="Search"
-              class="w-full !rounded-xl border-white/5! !bg-[#1a1d26] !py-2.5 !pl-10 !pr-14 !text-sm !text-slate-200 placeholder:!text-slate-500"
+              class="w-full !rounded-xl border-surface! !py-2.5 !pl-10 !pr-14 !text-sm"
               aria-label="Search navigation"
             />
           </p-iconfield>
           <span
-            class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-white/10 bg-[#111319] px-1.5 py-0.5 text-[10px] font-medium text-slate-500 sm:inline"
+            class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-surface bg-surface-0 dark:bg-surface-900 px-1.5 py-0.5 text-[10px] font-medium text-muted-color sm:inline"
           >
             ⌘ K
           </span>
@@ -87,7 +87,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
           [rounded]="true"
           [text]="true"
           severity="secondary"
-          styleClass="!size-9 !text-slate-400 hover:!text-white"
+          styleClass="!size-9 !text-muted-color hover:!text-color"
           ariaLabel="Search"
           pTooltip="Search"
           tooltipPosition="right"
@@ -104,7 +104,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
             <div class="mb-5">
               @if (!sidebar.collapsed()) {
                 <p
-                  class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500"
+                  class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-color"
                 >
                   {{ section.title }}
                 </p>
@@ -143,7 +143,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
                           }}</span>
 
                           @if (item.hasChildren) {
-                            <i class="pi pi-chevron-down text-xs text-slate-500" aria-hidden="true"></i>
+                            <i class="pi pi-chevron-down text-xs text-muted-color" aria-hidden="true"></i>
                           }
                         }
                       </span>
@@ -158,7 +158,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
     </div>
 
     <!-- Footer -->
-    <div class="mt-auto shrink-0 border-t border-white/5 px-3 py-4">
+    <div class="mt-auto shrink-0 border-t border-surface px-3 py-4">
       <div class="mb-3 flex flex-col gap-0.5">
         @for (link of footerLinks; track link.label) {
           <p-button
@@ -207,13 +207,13 @@ import { SidebarStateService } from '../services/sidebar-state.service';
 
           @if (!sidebar.collapsed()) {
             <span class="min-w-0 flex-1 text-left">
-              <span class="block text-[11px] text-slate-500">{{ storeProfile().label }}</span>
-              <span class="block truncate text-sm font-semibold text-white">{{
+              <span class="block text-[11px] text-muted-color">{{ storeProfile().label }}</span>
+              <span class="block truncate text-sm font-semibold text-color">{{
                 storeProfile().name
               }}</span>
             </span>
             @if (storeContext.hasMultipleStores()) {
-              <i class="pi pi-sort text-xs text-slate-500" aria-hidden="true"></i>
+              <i class="pi pi-sort text-xs text-muted-color" aria-hidden="true"></i>
             }
           }
         </span>
@@ -261,20 +261,20 @@ export class SidebarComponent {
       '!w-full !justify-start !rounded-xl !border-0 !px-3 !py-2.5 !shadow-none transition-colors';
     const collapsed = this.sidebar.collapsed() ? ' !px-2 !justify-center' : '';
     const active = this.isActive(item.route)
-      ? ' !bg-white/10 !text-white hover:!bg-white/10'
-      : ' !bg-transparent !text-slate-300 hover:!bg-white/5 hover:!text-white';
+      ? ' !bg-emphasis !text-color hover:!bg-emphasis'
+      : ' !bg-transparent !text-muted-color hover:!bg-emphasis hover:!text-color';
     return `${base}${collapsed}${active}`;
   }
 
   protected footerLinkClass(): string {
     const base =
-      '!w-full !justify-start !rounded-xl !border-0 !px-3 !py-2 !shadow-none !bg-transparent !text-slate-400 hover:!bg-white/5 hover:!text-slate-200 transition-colors';
+      '!w-full !justify-start !rounded-xl !border-0 !px-3 !py-2 !shadow-none !bg-transparent !text-muted-color hover:!bg-emphasis hover:!text-color transition-colors';
     return this.sidebar.collapsed() ? `${base} !px-2 !justify-center` : base;
   }
 
   protected storeSwitcherClass(): string {
     const base =
-      '!w-full !justify-start !rounded-xl !border !border-white/5 !bg-[#1a1d26] !p-2.5 !shadow-none hover:!border-white/10 hover:!bg-[#1f2330] transition-colors';
+      '!w-full !justify-start !rounded-xl !border !border-surface !p-2.5 !shadow-none hover:!border-surface hover:!bg-surface-200 dark:hover:!bg-surface-700 transition-colors';
     return this.sidebar.collapsed() ? `${base} !justify-center` : base;
   }
 

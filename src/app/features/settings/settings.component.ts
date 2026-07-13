@@ -21,65 +21,65 @@ const PREFS_KEY = 'heims_notification_prefs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, Card, ToggleSwitch, Button, Message],
   template: `
-    <div class="mb-6">
-      <h2 class="text-xl font-semibold text-white">Settings</h2>
-      <p class="mt-1 text-sm text-slate-500">Facility preferences and notification options.</p>
+    <div class="mb-6 w-full">
+      <h2 class="text-xl font-semibold text-color">Settings</h2>
+      <p class="mt-1 text-sm text-muted-color">Facility preferences and notification options.</p>
     </div>
 
     @if (saved()) {
       <p-message severity="success" text="Preferences saved." styleClass="!mb-4 !w-full max-w-3xl" />
     }
 
-    <div class="grid max-w-3xl gap-4">
-      <p-card styleClass="!rounded-2xl !border-white/5 !bg-[#111319]">
+    <div class="grid  gap-4">
+      <p-card styleClass="p-4 !rounded-2xl">
         <ng-template #header>
           <div class="px-1 pt-1">
-            <h3 class="font-medium text-slate-200">Account</h3>
-            <p class="mt-1 text-sm text-slate-500">Signed in as {{ user()?.fullName }}</p>
+            <h3 class="font-medium text-color">Account</h3>
+            <p class="mt-1 text-sm text-muted-color">Signed in as {{ user()?.fullName }}</p>
           </div>
         </ng-template>
         <div class="grid gap-3 text-sm">
-          <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
-            <span class="text-slate-500">Role</span>
-            <span class="text-slate-200">{{ roleLabel() }}</span>
+          <div class="flex justify-between gap-4 border-b border-surface pb-3">
+            <span class="text-muted-color">Role</span>
+            <span class="text-color">{{ roleLabel() }}</span>
           </div>
-          <div class="flex justify-between gap-4 border-b border-white/5 pb-3">
-            <span class="text-slate-500">Email</span>
-            <span class="text-slate-200">{{ user()?.email }}</span>
+          <div class="flex justify-between gap-4 border-b border-surface pb-3">
+            <span class="text-muted-color">Email</span>
+            <span class="text-color">{{ user()?.email }}</span>
           </div>
           <div class="flex justify-between gap-4">
-            <span class="text-slate-500">Username</span>
-            <span class="font-mono text-slate-200">{{ user()?.username }}</span>
+            <span class="text-muted-color">Username</span>
+            <span class="font-mono text-color">{{ user()?.username }}</span>
           </div>
         </div>
       </p-card>
 
-      <p-card styleClass="!rounded-2xl !border-white/5 !bg-[#111319]">
+      <p-card styleClass="p-4 !rounded-2xl">
         <ng-template #header>
           <div class="px-1 pt-1">
-            <h3 class="font-medium text-slate-200">Notifications</h3>
-            <p class="mt-1 text-sm text-slate-500">Control which alerts you receive in the app.</p>
+            <h3 class="font-medium text-color">Notifications</h3>
+            <p class="mt-1 text-sm text-muted-color">Control which alerts you receive in the app.</p>
           </div>
         </ng-template>
         <div class="flex flex-col gap-4">
           <div class="flex items-center justify-between gap-4">
             <div>
-              <p class="text-sm font-medium text-slate-200">Email alerts</p>
-              <p class="text-xs text-slate-500">Critical system notifications</p>
+              <p class="text-sm font-medium text-color">Email alerts</p>
+              <p class="text-xs text-muted-color">Critical system notifications</p>
             </div>
             <p-toggleswitch [(ngModel)]="prefs.emailAlerts" />
           </div>
           <div class="flex items-center justify-between gap-4">
             <div>
-              <p class="text-sm font-medium text-slate-200">Maintenance reminders</p>
-              <p class="text-xs text-slate-500">Upcoming and overdue PM tasks</p>
+              <p class="text-sm font-medium text-color">Maintenance reminders</p>
+              <p class="text-xs text-muted-color">Upcoming and overdue PM tasks</p>
             </div>
             <p-toggleswitch [(ngModel)]="prefs.maintenanceReminders" />
           </div>
           <div class="flex items-center justify-between gap-4">
             <div>
-              <p class="text-sm font-medium text-slate-200">Receiving updates</p>
-              <p class="text-xs text-slate-500">New registrations and installations</p>
+              <p class="text-sm font-medium text-color">Receiving updates</p>
+              <p class="text-xs text-muted-color">New registrations and installations</p>
             </div>
             <p-toggleswitch [(ngModel)]="prefs.receivingUpdates" />
           </div>
@@ -89,14 +89,14 @@ const PREFS_KEY = 'heims_notification_prefs';
         </div>
       </p-card>
 
-      <p-card styleClass="!rounded-2xl !border-white/5 !bg-[#111319]">
+      <p-card styleClass="p-4 !rounded-2xl">
         <ng-template #header>
           <div class="px-1 pt-1">
-            <h3 class="font-medium text-slate-200">Facility</h3>
-            <p class="mt-1 text-sm text-slate-500">MediTrack Hospital Equipment Inventory System</p>
+            <h3 class="font-medium text-color">Facility</h3>
+            <p class="mt-1 text-sm text-muted-color">MediTrack Hospital Equipment Inventory System</p>
           </div>
         </ng-template>
-        <p class="text-sm text-slate-400">
+        <p class="text-sm text-muted-color">
           Facility-wide configuration is managed by administrators through the backend. Contact your
           system administrator to update hospital profile details.
         </p>

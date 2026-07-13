@@ -1,168 +1,163 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import {
   DashboardSummary,
+  DepartmentBreakdownItem,
   KpiTrend,
-  OperationalHealthMetric,
   RecentActivityRow,
-  WeeklyActivityPoint,
 } from '../../core/models/dashboard-summary.model';
+import { ApiService } from '../../core/services/api.service';
+import { resolveEntityId } from '../../core/utils/entity.util';
 
-const SUMMARY: DashboardSummary = {
-  totalEquipment: 1284,
-  working: 1042,
-  underRepair: 96,
-  condemned: 21,
-  pendingInstallation: 38,
-  decommissioned: 87,
-  pmDueThisMonth: 63,
-  receivedToday: 7,
-};
+function formatCount(value: number | undefined): string {
+  return (value ?? 0).toLocaleString();
+}
 
-const KPI_TRENDS: KpiTrend[] = [
-  {
-    label: 'Total Equipment',
-    value: '1,284',
-    icon: 'pi pi-box',
-    deltaPercent: 4.6,
-    trend: 'up',
-    comparisonLabel: 'vs last month',
-  },
-  {
-    label: 'Operational Units',
-    value: '1,042',
-    icon: 'pi pi-check-circle',
-    deltaPercent: 2.1,
-    trend: 'up',
-    comparisonLabel: 'vs last month',
-  },
-  {
-    label: 'Under Repair',
-    value: '96',
-    icon: 'pi pi-wrench',
-    deltaPercent: 3.4,
-    trend: 'down',
-    comparisonLabel: 'vs last month',
-  },
-  {
-    label: 'PM Due This Month',
-    value: '63',
-    icon: 'pi pi-calendar-clock',
-    deltaPercent: 8.2,
-    trend: 'up',
-    comparisonLabel: 'vs last month',
-  },
-];
+function resolveDepartmentLabel(item: DepartmentBreakdownItem): string {
+  return item.name ?? item.department ?? 'Unknown';
+}
 
-const WEEKLY_ACTIVITY: WeeklyActivityPoint[] = [
-  { label: 'Mon', received: 14, installed: 9, pmCompleted: 6 },
-  { label: 'Tue', received: 18, installed: 12, pmCompleted: 9 },
-  { label: 'Wed', received: 12, installed: 15, pmCompleted: 11 },
-  { label: 'Thu', received: 24, installed: 19, pmCompleted: 16 },
-  { label: 'Fri', received: 16, installed: 11, pmCompleted: 13 },
-  { label: 'Sat', received: 9, installed: 7, pmCompleted: 8 },
-  { label: 'Sun', received: 20, installed: 17, pmCompleted: 15 },
-];
+function resolveDepartmentRef(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    if (typeof record['name'] === 'string') return record['name'];
+    if (typeof record['code'] === 'string') return record['code'];
+  }
+  return 'Unknown';
+}
 
-const OPERATIONAL_HEALTH: OperationalHealthMetric[] = [
-  { axis: 'Equipment Uptime', thisWeek: 92, lastWeek: 85 },
-  { axis: 'PM Compliance', thisWeek: 88, lastWeek: 80 },
-  { axis: 'Response Time', thisWeek: 76, lastWeek: 70 },
-  { axis: 'Inventory Accuracy', thisWeek: 95, lastWeek: 90 },
-  { axis: 'Dept. Coverage', thisWeek: 83, lastWeek: 78 },
-];
+function formatActivityDate(value: unknown): string {
+  if (!value) return '—';
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
-const RECENT_ACTIVITY: RecentActivityRow[] = [
-  {
-    assetNumber: '#EQ-3124',
-    equipmentName: 'Philips Patient Monitor MX450',
-    department: 'ICU',
-    status: 'WORKING',
-    assignedTo: 'Grace Adeyemi',
-    avatarInitials: 'GA',
-    updatedAt: 'Jul 10, 2026',
-  },
-  {
-    assetNumber: '#EQ-3125',
-    equipmentName: 'Drager Fabius Anesthesia Machine',
-    department: 'Surgery',
-    status: 'UNDER_REPAIR',
-    assignedTo: 'Tunde Bakare',
-    avatarInitials: 'TB',
-    updatedAt: 'Jul 10, 2026',
-  },
-  {
-    assetNumber: '#EQ-3126',
-    equipmentName: 'GE Voluson E10 Ultrasound',
-    department: 'Radiology',
-    status: 'PENDING_INSTALLATION',
-    assignedTo: 'Marcus Osei',
-    avatarInitials: 'MO',
-    updatedAt: 'Jul 9, 2026',
-  },
-  {
-    assetNumber: '#EQ-3121',
-    equipmentName: 'Baxter Infusion Pump Sigma Spectrum',
-    department: 'Pediatrics',
-    status: 'WORKING',
-    assignedTo: 'Grace Adeyemi',
-    avatarInitials: 'GA',
-    updatedAt: 'Jul 9, 2026',
-  },
-  {
-    assetNumber: '#EQ-3118',
-    equipmentName: 'Mindray BeneVision N22 Monitor',
-    department: 'Emergency',
-    status: 'CONDEMNED',
-    assignedTo: 'Tunde Bakare',
-    avatarInitials: 'TB',
-    updatedAt: 'Jul 8, 2026',
-  },
-  {
-    assetNumber: '#EQ-3109',
-    equipmentName: 'Siemens Somatom X.ceed CT Scanner',
-    department: 'Radiology',
-    status: 'WORKING',
-    assignedTo: 'Marcus Osei',
-    avatarInitials: 'MO',
-    updatedAt: 'Jul 8, 2026',
-  },
-  {
-    assetNumber: '#EQ-3097',
-    equipmentName: 'Stryker Electric Hospital Bed',
-    department: 'Orthopedics',
-    status: 'DECOMMISSIONED',
-    assignedTo: 'Grace Adeyemi',
-    avatarInitials: 'GA',
-    updatedAt: 'Jul 7, 2026',
-  },
-];
+function initialsFromName(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
 
-/**
- * Serves mock data shaped exactly like the eventual `GET /dashboard/summary` response
- * (see FRONTEND-GUIDE.md § Step 14) so this service — and every component consuming it —
- * can be pointed at `ApiService` later without touching the dashboard component itself.
- */
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  getSummary(): Observable<DashboardSummary> {
-    return of(SUMMARY).pipe(delay(150));
+  private readonly api = inject(ApiService);
+
+  getSummary(departmentId?: string): Observable<DashboardSummary> {
+    const query = departmentId ? { department: departmentId } : {};
+    return this.api.get<DashboardSummary>('/dashboard/summary', query).pipe(
+      map((res) => this.normalizeSummary(res.data)),
+    );
   }
 
-  getKpiTrends(): Observable<KpiTrend[]> {
-    return of(KPI_TRENDS).pipe(delay(150));
+  buildKpiTrends(summary: DashboardSummary): KpiTrend[] {
+    return [
+      {
+        label: 'Total Equipment',
+        value: formatCount(summary.totalEquipment),
+        icon: 'pi pi-box',
+      },
+      {
+        label: 'Operational Units',
+        value: formatCount(summary.working),
+        icon: 'pi pi-check-circle',
+      },
+      {
+        label: 'Under Repair',
+        value: formatCount(summary.underRepair),
+        icon: 'pi pi-wrench',
+      },
+      {
+        label: 'PM Due This Month',
+        value: formatCount(summary.pmDueThisMonth),
+        icon: 'pi pi-calendar-clock',
+      },
+      {
+        label: 'Pending Installation',
+        value: formatCount(summary.pendingInstallation),
+        icon: 'pi pi-clock',
+      },
+      {
+        label: 'Condemned',
+        value: formatCount(summary.condemned),
+        icon: 'pi pi-times-circle',
+      },
+      {
+        label: 'Decommissioned',
+        value: formatCount(summary.decommissioned),
+        icon: 'pi pi-ban',
+      },
+      {
+        label: 'Received Today',
+        value: formatCount(summary.receivedToday),
+        icon: 'pi pi-inbox',
+      },
+    ];
   }
 
-  getWeeklyActivity(): Observable<WeeklyActivityPoint[]> {
-    return of(WEEKLY_ACTIVITY).pipe(delay(150));
+  private normalizeSummary(data: DashboardSummary): DashboardSummary {
+    return {
+      ...data,
+      totalEquipment: data.totalEquipment ?? 0,
+      working: data.working ?? 0,
+      underRepair: data.underRepair ?? 0,
+      condemned: data.condemned ?? 0,
+      pendingInstallation: data.pendingInstallation ?? 0,
+      decommissioned: data.decommissioned ?? 0,
+      pmDueThisMonth: data.pmDueThisMonth ?? 0,
+      receivedToday: data.receivedToday ?? 0,
+      byDepartment: (data.byDepartment ?? []).map((item) => this.normalizeDepartmentBreakdown(item)),
+      weeklyActivity: data.weeklyActivity ?? [],
+      operationalHealth: data.operationalHealth ?? [],
+      recentActivity: (data.recentActivity ?? []).map((item) => this.normalizeRecentActivity(item)),
+    };
   }
 
-  getOperationalHealth(): Observable<OperationalHealthMetric[]> {
-    return of(OPERATIONAL_HEALTH).pipe(delay(150));
+  private normalizeDepartmentBreakdown(item: DepartmentBreakdownItem): DepartmentBreakdownItem {
+    return {
+      ...item,
+      departmentId: item.departmentId ?? resolveEntityId(item),
+      name: resolveDepartmentLabel(item),
+      count: item.count ?? 0,
+    };
   }
 
-  getRecentActivity(): Observable<RecentActivityRow[]> {
-    return of(RECENT_ACTIVITY).pipe(delay(150));
+  private normalizeRecentActivity(item: RecentActivityRow | Record<string, unknown>): RecentActivityRow {
+    const record = item as Record<string, unknown>;
+    const assignedTo =
+      typeof record['assignedTo'] === 'string'
+        ? record['assignedTo']
+        : typeof (record['assignedTo'] as Record<string, unknown> | undefined)?.['fullName'] === 'string'
+          ? String((record['assignedTo'] as Record<string, unknown>)['fullName'])
+          : typeof record['assignedEngineer'] === 'string'
+            ? String(record['assignedEngineer'])
+            : '—';
+
+    const equipmentName =
+      typeof record['equipmentName'] === 'string'
+        ? record['equipmentName']
+        : typeof record['name'] === 'string'
+          ? record['name']
+          : 'Unknown equipment';
+
+    return {
+      assetNumber:
+        typeof record['assetNumber'] === 'string'
+          ? record['assetNumber']
+          : typeof record['assetTag'] === 'string'
+            ? record['assetTag']
+            : '—',
+      equipmentName,
+      department: resolveDepartmentRef(record['department']),
+      status: typeof record['status'] === 'string' ? record['status'] : 'UNKNOWN',
+      assignedTo,
+      avatarInitials:
+        typeof record['avatarInitials'] === 'string' ? record['avatarInitials'] : initialsFromName(assignedTo),
+      updatedAt: formatActivityDate(record['updatedAt'] ?? record['changedAt'] ?? record['createdAt']),
+    };
   }
 }

@@ -10,7 +10,7 @@ import { KpiTrend } from '../../../core/models/dashboard-summary.model';
   imports: [Button, Tag, TooltipModule],
   template: `
     <div
-      class="group relative overflow-hidden rounded-2xl border border-white/5 bg-[#111319] p-5 transition-colors hover:border-white/10"
+      class="group relative overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900 p-5 transition-colors hover:border-surface"
     >
       <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-2.5">
@@ -20,11 +20,11 @@ import { KpiTrend } from '../../../core/models/dashboard-summary.model';
             [rounded]="true"
             [text]="true"
             severity="secondary"
-            styleClass="!size-9 !cursor-default !bg-orange-500/10 !text-orange-400 pointer-events-none"
+            styleClass="!size-9 !cursor-default !bg-primary/10 !text-primary pointer-events-none"
             [attr.aria-hidden]="true"
             tabindex="-1"
           />
-          <span class="text-sm font-medium text-slate-400">{{ kpi().label }}</span>
+          <span class="text-sm font-medium text-muted-color">{{ kpi().label }}</span>
         </div>
 
         <p-button
@@ -33,30 +33,32 @@ import { KpiTrend } from '../../../core/models/dashboard-summary.model';
           [rounded]="true"
           [text]="true"
           severity="secondary"
-          styleClass="!size-8 !text-slate-500 opacity-0 transition-opacity group-hover:opacity-100 hover:!text-slate-300 hover:!bg-slate-700"
+          styleClass="!size-8 !text-muted-color opacity-0 transition-opacity group-hover:opacity-100 hover:!text-color hover:!bg-emphasis"
           ariaLabel="More options"
           pTooltip="More options"
           tooltipPosition="top"
         />
       </div>
 
-      <p class="mt-4 text-3xl font-semibold tracking-tight text-white">{{ kpi().value }}</p>
+      <p class="mt-4 text-3xl font-semibold tracking-tight text-color">{{ kpi().value }}</p>
 
-      <div class="mt-3 flex items-center gap-2">
-        <p-tag
-          [icon]="kpi().trend === 'up' ? 'pi pi-arrow-up-right' : 'pi pi-arrow-down-right'"
-          [value]="kpi().deltaPercent + '%'"
-          [severity]="kpi().trend === 'up' ? 'success' : 'danger'"
-          [rounded]="true"
-          styleClass="!text-xs !font-semibold"
-          [pTooltip]="kpi().comparisonLabel"
-          tooltipPosition="top"
-        />
-        <span class="text-xs text-slate-500">{{ kpi().comparisonLabel }}</span>
-      </div>
+      @if (kpi().deltaPercent != null && kpi().trend && kpi().comparisonLabel) {
+        <div class="mt-3 flex items-center gap-2">
+          <p-tag
+            [icon]="kpi().trend === 'up' ? 'pi pi-arrow-up-right' : 'pi pi-arrow-down-right'"
+            [value]="kpi().deltaPercent + '%'"
+            [severity]="kpi().trend === 'up' ? 'success' : 'danger'"
+            [rounded]="true"
+            styleClass="!text-xs !font-semibold"
+            [pTooltip]="kpi().comparisonLabel"
+            tooltipPosition="top"
+          />
+          <span class="text-xs text-muted-color">{{ kpi().comparisonLabel }}</span>
+        </div>
+      }
 
       <span
-        class="pointer-events-none absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-orange-500 transition-transform duration-300 group-hover:scale-x-100"
+        class="pointer-events-none absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100"
         aria-hidden="true"
       ></span>
     </div>

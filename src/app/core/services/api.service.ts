@@ -17,8 +17,13 @@ export class ApiService {
     });
   }
 
-  get<T>(path: string): Observable<ApiResponse<T>> {
-    return this.http.get<ApiResponse<T>>(`${environment.apiUrl}${path}`);
+  get<T>(path: string, query: Record<string, unknown> = {}): Observable<ApiResponse<T>> {
+    const params = Object.fromEntries(
+      Object.entries(query).filter(([, value]) => value !== undefined && value !== null && value !== ''),
+    );
+    return this.http.get<ApiResponse<T>>(`${environment.apiUrl}${path}`, {
+      params: params as Record<string, string>,
+    });
   }
 
   post<T>(path: string, body: unknown): Observable<ApiResponse<T>> {

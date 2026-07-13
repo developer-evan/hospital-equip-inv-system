@@ -10,13 +10,13 @@ import { SidebarStateService } from '../services/sidebar-state.service';
   selector: 'app-dashboard-layout',
   imports: [RouterOutlet, Drawer, DashboardHeaderComponent, SidebarComponent],
   template: `
-    <div class="flex h-dvh overflow-hidden bg-[#0a0b0f] text-slate-100">
+    <div class="flex h-dvh overflow-hidden bg-surface-50 dark:bg-surface-950 text-color">
       <!-- Mobile navigation drawer -->
       <p-drawer
         [visible]="sidebar.mobileOpen()"
         (visibleChange)="onMobileDrawerChange($event)"
         position="left"
-        styleClass="!w-[min(100vw,18rem)] !border-0 !bg-[#111319] !p-0"
+        styleClass="!w-[min(100vw,18rem)] !border-0 !bg-surface-0 dark:bg-surface-900 !p-0"
         [closable]="false"
         [modal]="true"
         [dismissible]="true"
@@ -29,7 +29,7 @@ import { SidebarStateService } from '../services/sidebar-state.service';
 
       <!-- Desktop sidebar -->
       <aside
-        class="hidden shrink-0 border-r border-white/5 transition-[width] duration-200 lg:flex lg:flex-col"
+        class="hidden shrink-0 border-r border-surface transition-[width] duration-200 lg:flex lg:flex-col"
         [class.w-64]="!sidebar.collapsed()"
         [class.w-[4.5rem]]="sidebar.collapsed()"
         aria-label="Sidebar"

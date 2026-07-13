@@ -23,17 +23,17 @@ import { Notification } from '../../core/models/notification.model';
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Notifications</h2>
-        <p class="mt-1 text-sm text-slate-500">Alerts and updates across your facility.</p>
+        <h2 class="text-xl font-semibold text-color">Notifications</h2>
+        <p class="mt-1 text-sm text-muted-color">Alerts and updates across your facility.</p>
       </div>
       <p-button type="button" icon="pi pi-check" label="Mark all read" [outlined]="true" severity="secondary" styleClass="!rounded-xl" (onClick)="markAllRead()" />
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table [value]="notifications()" [loading]="loading()" [lazy]="true" [paginator]="true" [rows]="pageSize" [totalRecords]="totalRecords()" (onLazyLoad)="onLazyLoad($event)" styleClass="dashboard-table" paginatorStyleClass="dashboard-paginator" [rowHover]="true">
         <ng-template #caption>
           <div class="flex items-center gap-3">
-            <span class="text-sm text-slate-400">Unread only</span>
+            <span class="text-sm text-muted-color">Unread only</span>
             <p-toggleswitch [(ngModel)]="unreadOnly" (ngModelChange)="onFilterChanged()" />
           </div>
         </ng-template>
@@ -51,10 +51,10 @@ import { Notification } from '../../core/models/notification.model';
               <p-tag [value]="item.isRead ? 'Read' : 'Unread'" [severity]="item.isRead ? 'secondary' : 'warn'" styleClass="!text-xs" />
             </td>
             <td>
-              <p class="font-medium text-slate-200">{{ item.title }}</p>
-              <p class="mt-0.5 text-sm text-slate-500">{{ item.message }}</p>
+              <p class="font-medium text-color">{{ item.title }}</p>
+              <p class="mt-0.5 text-sm text-muted-color">{{ item.message }}</p>
             </td>
-            <td class="text-sm text-slate-500">{{ formatDate(item.createdAt) }}</td>
+            <td class="text-sm text-muted-color">{{ formatDate(item.createdAt) }}</td>
             <td class="text-right">
               @if (!item.isRead) {
                 <p-button type="button" icon="pi pi-check" [rounded]="true" [text]="true" pTooltip="Mark read" (onClick)="markRead(item)" />
@@ -63,7 +63,7 @@ import { Notification } from '../../core/models/notification.model';
           </tr>
         </ng-template>
         <ng-template #emptymessage>
-          <tr><td colspan="4"><div class="py-14 text-center text-sm text-slate-500">No notifications.</div></td></tr>
+          <tr><td colspan="4"><div class="py-14 text-center text-sm text-muted-color">No notifications.</div></td></tr>
         </ng-template>
       </p-table>
     </div>

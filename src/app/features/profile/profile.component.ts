@@ -18,22 +18,22 @@ import { ROLE_LABEL } from '../../core/models/role.enum';
   imports: [ReactiveFormsModule, Card, Password, Button, Tag, Message],
   template: `
     <div class="mb-6">
-      <h2 class="text-xl font-semibold text-white">My Profile</h2>
-      <p class="mt-1 text-sm text-slate-500">Your account details and password.</p>
+      <h2 class="text-xl font-semibold text-color">My Profile</h2>
+      <p class="mt-1 text-sm text-muted-color">Your account details and password.</p>
     </div>
 
     @if (loading()) {
-      <p class="text-sm text-slate-500">Loading profile…</p>
+      <p class="text-sm text-muted-color">Loading profile…</p>
     } @else if (profile()) {
       <div class="grid max-w-3xl gap-4">
-        <p-card styleClass="!rounded-2xl !border-white/5 !bg-[#111319]">
+        <p-card styleClass="!rounded-2xl !border-surface !bg-surface-0 dark:bg-surface-900">
           <div class="flex items-start gap-4">
             <span class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500/15 text-lg font-semibold text-orange-300">
               {{ initials(profile()!.fullName) }}
             </span>
             <div class="min-w-0 flex-1">
-              <h3 class="text-lg font-semibold text-white">{{ profile()!.fullName }}</h3>
-              <p class="text-sm text-slate-500">{{ profile()!.email }}</p>
+              <h3 class="text-lg font-semibold text-color">{{ profile()!.fullName }}</h3>
+              <p class="text-sm text-muted-color">{{ profile()!.email }}</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 <p-tag [value]="roleLabel(profile()!.role)" severity="warn" styleClass="!text-xs" />
                 <p-tag [value]="profile()!.isActive ? 'Active' : 'Inactive'" [severity]="profile()!.isActive ? 'success' : 'danger'" styleClass="!text-xs" />
@@ -41,29 +41,29 @@ import { ROLE_LABEL } from '../../core/models/role.enum';
             </div>
           </div>
 
-          <div class="mt-6 grid gap-3 border-t border-white/5 pt-5 text-sm">
+          <div class="mt-6 grid gap-3 border-t border-surface pt-5 text-sm">
             <div class="flex justify-between gap-4">
-              <span class="text-slate-500">Username</span>
-              <span class="font-mono text-slate-200">{{ profile()!.username }}</span>
+              <span class="text-muted-color">Username</span>
+              <span class="font-mono text-color">{{ profile()!.username }}</span>
             </div>
             <div class="flex justify-between gap-4">
-              <span class="text-slate-500">Departments</span>
-              <span class="text-right text-slate-200">{{ departmentLabels(profile()!) }}</span>
+              <span class="text-muted-color">Departments</span>
+              <span class="text-right text-color">{{ departmentLabels(profile()!) }}</span>
             </div>
             @if (profile()!.lastLoginAt) {
               <div class="flex justify-between gap-4">
-                <span class="text-slate-500">Last login</span>
-                <span class="text-slate-200">{{ formatDate(profile()!.lastLoginAt!) }}</span>
+                <span class="text-muted-color">Last login</span>
+                <span class="text-color">{{ formatDate(profile()!.lastLoginAt!) }}</span>
               </div>
             }
           </div>
         </p-card>
 
-        <p-card styleClass="!rounded-2xl !border-white/5 !bg-[#111319]">
+        <p-card styleClass="!rounded-2xl !border-surface !bg-surface-0 dark:bg-surface-900">
           <ng-template #header>
             <div class="px-1 pt-1">
-              <h3 class="font-medium text-slate-200">Change password</h3>
-              <p class="mt-1 text-sm text-slate-500">Update your account password.</p>
+              <h3 class="font-medium text-color">Change password</h3>
+              <p class="mt-1 text-sm text-muted-color">Update your account password.</p>
             </div>
           </ng-template>
 
@@ -75,8 +75,8 @@ import { ROLE_LABEL } from '../../core/models/role.enum';
           }
 
           <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="flex flex-col gap-4">
-            <p-password formControlName="currentPassword" placeholder="Current password" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
-            <p-password formControlName="newPassword" placeholder="New password (min 8 chars)" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
+            <p-password formControlName="currentPassword" placeholder="Current password" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-surface !py-2.5" />
+            <p-password formControlName="newPassword" placeholder="New password (min 8 chars)" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full !rounded-xl !border-surface !py-2.5" />
             <div class="flex justify-end">
               <p-button type="submit" label="Update password" icon="pi pi-lock" [loading]="saving()" [disabled]="passwordForm.invalid || saving()" styleClass="!rounded-xl !border-orange-500 !bg-orange-500" />
             </div>

@@ -50,8 +50,8 @@ interface SelectOption {
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Receiving</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-xl font-semibold text-color">Receiving</h2>
+        <p class="mt-1 text-sm text-muted-color">
           Register incoming equipment and confirm installation.
         </p>
       </div>
@@ -66,7 +66,7 @@ interface SelectOption {
       }
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table
         [value]="pending()"
         [loading]="loading()"
@@ -81,8 +81,8 @@ interface SelectOption {
       >
         <ng-template #caption>
           <div>
-            <p class="text-sm font-medium text-slate-200">Pending installation</p>
-            <p class="text-xs text-slate-500">{{ totalRecords() }} assets awaiting setup</p>
+            <p class="text-sm font-medium text-color">Pending installation</p>
+            <p class="text-xs text-muted-color">{{ totalRecords() }} assets awaiting setup</p>
           </div>
         </ng-template>
         <ng-template #header>
@@ -100,10 +100,10 @@ interface SelectOption {
           <tr>
             <td><span class="font-mono text-xs text-orange-300/90">{{ item.assetNumber }}</span></td>
             <td>
-              <p class="font-medium text-slate-200">{{ item.name }}</p>
-              <p class="text-xs text-slate-500">{{ item.manufacturer }} · SN {{ item.serialNumber }}</p>
+              <p class="font-medium text-color">{{ item.name }}</p>
+              <p class="text-xs text-muted-color">{{ item.manufacturer }} · SN {{ item.serialNumber }}</p>
             </td>
-            <td class="text-sm text-slate-400">{{ departmentLabel(item) }}</td>
+            <td class="text-sm text-muted-color">{{ departmentLabel(item) }}</td>
             <td><app-status-badge [status]="item.status" /></td>
             @if (canConfirm()) {
               <td class="text-right">
@@ -122,7 +122,7 @@ interface SelectOption {
         <ng-template #emptymessage>
           <tr>
             <td [attr.colspan]="canConfirm() ? 5 : 4">
-              <div class="py-14 text-center text-sm text-slate-500">No pending installations.</div>
+              <div class="py-14 text-center text-sm text-muted-color">No pending installations.</div>
             </td>
           </tr>
         </ng-template>
@@ -141,13 +141,13 @@ interface SelectOption {
         <p-message severity="error" [text]="formError()!" styleClass="!mb-4 !w-full" />
       }
       <form [formGroup]="registerForm" (ngSubmit)="submitRegister()" class="grid gap-4 sm:grid-cols-2">
-        <input pInputText formControlName="name" placeholder="Name *" class="sm:col-span-2 !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
-        <input pInputText formControlName="category" placeholder="Category *" class="!rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
-        <input pInputText formControlName="manufacturer" placeholder="Manufacturer *" class="!rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
-        <input pInputText formControlName="model" placeholder="Model" class="!rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
-        <input pInputText formControlName="serialNumber" placeholder="Serial number *" class="!rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5" />
+        <input pInputText formControlName="name" placeholder="Name *" class="sm:col-span-2 !rounded-xl !border-surface !py-2.5" />
+        <input pInputText formControlName="category" placeholder="Category *" class="!rounded-xl !border-surface !py-2.5" />
+        <input pInputText formControlName="manufacturer" placeholder="Manufacturer *" class="!rounded-xl !border-surface !py-2.5" />
+        <input pInputText formControlName="model" placeholder="Model" class="!rounded-xl !border-surface !py-2.5" />
+        <input pInputText formControlName="serialNumber" placeholder="Serial number *" class="!rounded-xl !border-surface !py-2.5" />
         <p-select formControlName="department" [options]="departmentOptions()" optionLabel="label" optionValue="value" placeholder="Department *" styleClass="sm:col-span-2 w-full !rounded-xl" />
-        <div class="sm:col-span-2 flex justify-end gap-2 border-t border-white/5 pt-4">
+        <div class="sm:col-span-2 flex justify-end gap-2 border-t border-surface pt-4">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="registerVisible = false" />
           <p-button type="submit" label="Register" icon="pi pi-check" [loading]="saving()" [disabled]="registerForm.invalid || saving()" />
         </div>
@@ -165,9 +165,9 @@ interface SelectOption {
         <p-message severity="error" [text]="formError()!" styleClass="!mb-4 !w-full" />
       }
       <form [formGroup]="confirmForm" (ngSubmit)="submitConfirm()" class="flex flex-col gap-4">
-        <p class="text-sm text-slate-400">Confirm installation for <strong class="text-slate-200">{{ selected()?.name }}</strong></p>
-        <input type="date" formControlName="installationDate" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100" />
-        <textarea formControlName="note" rows="3" placeholder="Optional note" class="rounded-xl border border-white/10 bg-[#1a1d26] px-3 py-2.5 text-slate-100"></textarea>
+        <p class="text-sm text-muted-color">Confirm installation for <strong class="text-color">{{ selected()?.name }}</strong></p>
+        <input type="date" formControlName="installationDate" class="rounded-xl border border-surface px-3 py-2.5" />
+        <textarea formControlName="note" rows="3" placeholder="Optional note" class="rounded-xl border border-surface px-3 py-2.5"></textarea>
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="confirmVisible = false" />
           <p-button type="submit" label="Confirm" icon="pi pi-check" [loading]="saving()" [disabled]="confirmForm.invalid || saving()" />

@@ -64,8 +64,8 @@ type DepartmentOption = Department & { _id?: string };
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Users</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-xl font-semibold text-color">Users</h2>
+        <p class="mt-1 text-sm text-muted-color">
           Create accounts, assign roles and departments across your facility.
         </p>
       </div>
@@ -79,7 +79,7 @@ type DepartmentOption = Department & { _id?: string };
       />
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table
         [value]="users()"
         [loading]="loading()"
@@ -97,8 +97,8 @@ type DepartmentOption = Department & { _id?: string };
         <ng-template #caption>
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm font-medium text-slate-200">All users</p>
-              <p class="text-xs text-slate-500">{{ totalRecords() }} total accounts</p>
+              <p class="text-sm font-medium text-color">All users</p>
+              <p class="text-xs text-muted-color">{{ totalRecords() }} total accounts</p>
             </div>
 
             <p-iconfield iconPosition="left" class="w-full sm:w-72">
@@ -107,7 +107,7 @@ type DepartmentOption = Department & { _id?: string };
                 pInputText
                 type="search"
                 placeholder="Search username, email or name…"
-                class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2 !text-sm !text-slate-100 placeholder:!text-slate-500"
+                class="w-full !rounded-xl !border-surface !py-2 !text-sm"
                 [value]="searchInput()"
                 (input)="onSearchInput($event)"
               />
@@ -136,13 +136,13 @@ type DepartmentOption = Department & { _id?: string };
                   styleClass="!size-9 !bg-orange-500/15 !text-xs !font-semibold !text-orange-300"
                 />
                 <div class="min-w-0">
-                  <p class="truncate font-medium text-slate-200">{{ user.fullName }}</p>
-                  <p class="truncate text-xs text-slate-500">{{ user.email }}</p>
+                  <p class="truncate font-medium text-color">{{ user.fullName }}</p>
+                  <p class="truncate text-xs text-muted-color">{{ user.email }}</p>
                 </div>
               </div>
             </td>
             <td>
-              <span class="font-mono text-sm text-slate-400">{{ user.username }}</span>
+              <span class="font-mono text-sm text-muted-color">{{ user.username }}</span>
             </td>
             <td>
               <p-tag
@@ -152,7 +152,7 @@ type DepartmentOption = Department & { _id?: string };
               />
             </td>
             <td>
-              <span class="text-sm text-slate-400">{{ departmentLabels(user) }}</span>
+              <span class="text-sm text-muted-color">{{ departmentLabels(user) }}</span>
             </td>
             <td>
               <p-tag
@@ -180,13 +180,13 @@ type DepartmentOption = Department & { _id?: string };
             <td colspan="6">
               <div class="flex flex-col items-center justify-center gap-3 py-14 text-center">
                 <span
-                  class="flex size-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-slate-500"
+                  class="flex size-12 items-center justify-center rounded-2xl border border-surface text-muted-color"
                 >
                   <i class="pi pi-users text-xl"></i>
                 </span>
                 <div>
-                  <p class="text-sm font-medium text-slate-300">No users found</p>
-                  <p class="mt-1 text-xs text-slate-500">
+                  <p class="text-sm font-medium text-color">No users found</p>
+                  <p class="mt-1 text-xs text-muted-color">
                     Try a different search or add a new user account.
                   </p>
                 </div>
@@ -214,42 +214,42 @@ type DepartmentOption = Department & { _id?: string };
       <form [formGroup]="form" (ngSubmit)="saveUser()" class="flex flex-col gap-4">
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="fullName" class="text-sm font-medium text-slate-300">Full name</label>
+            <label for="fullName" class="text-sm font-medium text-color">Full name</label>
             <input
               pInputText
               id="fullName"
               formControlName="fullName"
               placeholder="Dr. Jane Doe"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="username" class="text-sm font-medium text-slate-300">Username</label>
+            <label for="username" class="text-sm font-medium text-color">Username</label>
             <input
               pInputText
               id="username"
               formControlName="username"
               placeholder="jdoe"
               autocomplete="off"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="email" class="text-sm font-medium text-slate-300">Email</label>
+            <label for="email" class="text-sm font-medium text-color">Email</label>
             <input
               pInputText
               id="email"
               type="email"
               formControlName="email"
               placeholder="jane.doe@hospital.org"
-              class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              class="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5 sm:col-span-2">
-            <label for="password" class="text-sm font-medium text-slate-300">Password</label>
+            <label for="password" class="text-sm font-medium text-color">Password</label>
             <p-password
               inputId="password"
               formControlName="password"
@@ -258,12 +258,12 @@ type DepartmentOption = Department & { _id?: string };
               [feedback]="false"
               autocomplete="new-password"
               styleClass="w-full"
-              inputStyleClass="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+              inputStyleClass="w-full !rounded-xl !border-surface !py-2.5"
             />
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="role" class="text-sm font-medium text-slate-300">Role</label>
+            <label for="role" class="text-sm font-medium text-color">Role</label>
             <p-select
               inputId="role"
               formControlName="role"
@@ -276,7 +276,7 @@ type DepartmentOption = Department & { _id?: string };
           </div>
 
           <div class="flex flex-col gap-1.5">
-            <label for="departments" class="text-sm font-medium text-slate-300">Departments</label>
+            <label for="departments" class="text-sm font-medium text-color">Departments</label>
             <p-multiselect
               inputId="departments"
               formControlName="departments"
@@ -298,13 +298,13 @@ type DepartmentOption = Department & { _id?: string };
           </div>
         </div>
 
-        <div class="mt-2 flex justify-end gap-2 border-t border-white/5 pt-4">
+        <div class="mt-2 flex justify-end gap-2 border-t border-surface pt-4">
           <p-button
             type="button"
             label="Cancel"
             [text]="true"
             severity="secondary"
-            styleClass="!text-slate-400"
+            styleClass="!text-muted-color"
             (onClick)="closeDialog()"
           />
           <p-button

@@ -50,8 +50,8 @@ type DepartmentRecord = Department & { _id?: string };
   template: `
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-white">Departments</h2>
-        <p class="mt-1 text-sm text-slate-500">
+        <h2 class="text-xl font-semibold text-color">Departments</h2>
+        <p class="mt-1 text-sm text-muted-color">
           Manage hospital departments that equipment and staff are scoped to.
         </p>
       </div>
@@ -67,7 +67,7 @@ type DepartmentRecord = Department & { _id?: string };
       }
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#111319]">
+    <div class="overflow-hidden rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900">
       <p-table
         [value]="departments()"
         [loading]="loading()"
@@ -85,8 +85,8 @@ type DepartmentRecord = Department & { _id?: string };
         <ng-template #caption>
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm font-medium text-slate-200">All departments</p>
-              <p class="text-xs text-slate-500">{{ totalRecords() }} total departments</p>
+              <p class="text-sm font-medium text-color">All departments</p>
+              <p class="text-xs text-muted-color">{{ totalRecords() }} total departments</p>
             </div>
 
             <p-iconfield iconPosition="left" class="w-full sm:w-72">
@@ -95,7 +95,7 @@ type DepartmentRecord = Department & { _id?: string };
                 pInputText
                 type="search"
                 placeholder="Search name, code or location…"
-                class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2 !text-sm !text-slate-100 placeholder:!text-slate-500"
+                class="w-full rounded-xl! border-surface! !py-2 !text-sm"
                 [value]="searchInput()"
                 (input)="onSearchInput($event)"
               />
@@ -120,18 +120,18 @@ type DepartmentRecord = Department & { _id?: string };
             <td>
               <div class="flex items-center gap-3">
                 <span
-                  class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/5 bg-white/5 text-sm font-semibold text-orange-300"
+                  class="flex size-9 shrink-0 items-center justify-center rounded-xl border border-surface text-sm font-semibold text-orange-300"
                 >
                   {{ dept.code.slice(0, 2).toUpperCase() }}
                 </span>
-                <span class="font-medium text-slate-200">{{ dept.name }}</span>
+                <span class="font-medium text-color">{{ dept.name }}</span>
               </div>
             </td>
             <td>
-              <span class="font-mono text-sm text-slate-400">{{ dept.code }}</span>
+              <span class="font-mono text-sm text-muted-color">{{ dept.code }}</span>
             </td>
             <td>
-              <span class="text-sm text-slate-400">{{ dept.location || '—' }}</span>
+              <span class="text-sm text-muted-color">{{ dept.location || '—' }}</span>
             </td>
             <td>
               <p-tag
@@ -149,7 +149,7 @@ type DepartmentRecord = Department & { _id?: string };
                     [rounded]="true"
                     [text]="true"
                     severity="secondary"
-                    styleClass="!size-8 !text-slate-500 hover:!text-slate-300"
+                    styleClass="!size-8 !text-muted-color hover:!text-color"
                     pTooltip="Edit department"
                     tooltipPosition="left"
                     (onClick)="openEditDialog(dept)"
@@ -160,7 +160,7 @@ type DepartmentRecord = Department & { _id?: string };
                     [rounded]="true"
                     [text]="true"
                     severity="danger"
-                    styleClass="!size-8 !text-slate-500 hover:!text-rose-400"
+                    styleClass="!size-8 !text-muted-color hover:!text-rose-400"
                     pTooltip="Delete department"
                     tooltipPosition="left"
                     (onClick)="confirmDelete(dept)"
@@ -176,13 +176,13 @@ type DepartmentRecord = Department & { _id?: string };
             <td [attr.colspan]="canManage() ? 5 : 4">
               <div class="flex flex-col items-center justify-center gap-3 py-14 text-center">
                 <span
-                  class="flex size-12 items-center justify-center rounded-2xl border border-white/5 bg-white/5 text-slate-500"
+                  class="flex size-12 items-center justify-center rounded-2xl border border-surface text-muted-color"
                 >
                   <i class="pi pi-building text-xl"></i>
                 </span>
                 <div>
-                  <p class="text-sm font-medium text-slate-300">No departments found</p>
-                  <p class="mt-1 text-xs text-slate-500">
+                  <p class="text-sm font-medium text-color">No departments found</p>
+                  <p class="mt-1 text-xs text-muted-color">
                     Try a different search or add a new department.
                   </p>
                 </div>
@@ -209,47 +209,47 @@ type DepartmentRecord = Department & { _id?: string };
 
       <form [formGroup]="form" (ngSubmit)="saveDepartment()" class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
-          <label for="deptName" class="text-sm font-medium text-slate-300">Name</label>
+          <label for="deptName" class="text-sm font-medium text-color">Name</label>
           <input
             pInputText
             id="deptName"
             formControlName="name"
             placeholder="Intensive Care Unit"
-            class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+            class="w-full !rounded-xl !border-surface !py-2.5"
           />
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label for="deptCode" class="text-sm font-medium text-slate-300">Code</label>
+          <label for="deptCode" class="text-sm font-medium text-color">Code</label>
           <input
             pInputText
             id="deptCode"
             formControlName="code"
             placeholder="ICU"
-            class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+            class="w-full !rounded-xl !border-surface !py-2.5"
           />
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label for="deptLocation" class="text-sm font-medium text-slate-300">
-            Location <span class="text-slate-600">(optional)</span>
+          <label for="deptLocation" class="text-sm font-medium text-color">
+            Location <span class="text-muted-color">(optional)</span>
           </label>
           <input
             pInputText
             id="deptLocation"
             formControlName="location"
             placeholder="Building A, Floor 3"
-            class="w-full !rounded-xl !border-white/10 !bg-[#1a1d26] !py-2.5 !text-slate-100 placeholder:!text-slate-500"
+            class="w-full !rounded-xl !border-surface !py-2.5"
           />
         </div>
 
-        <div class="mt-2 flex justify-end gap-2 border-t border-white/5 pt-4">
+        <div class="mt-2 flex justify-end gap-2 border-t border-surface pt-4">
           <p-button
             type="button"
             label="Cancel"
             [text]="true"
             severity="secondary"
-            styleClass="!text-slate-400"
+            styleClass="!text-muted-color"
             (onClick)="closeDialog()"
           />
           <p-button
