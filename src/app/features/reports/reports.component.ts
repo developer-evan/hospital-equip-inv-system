@@ -3,8 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { Card } from 'primeng/card';
 
 import { ReportsService, ReportFilter, ReportFormat, ReportType } from '../../core/services/reports.service';
 import { DepartmentsService } from '../../core/services/departments.service';
@@ -28,23 +26,92 @@ interface ReportItem {
 @Component({
   selector: 'app-reports',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Button, InputText, Select, SelectButton, Card],
+  imports: [FormsModule, Button, InputText, Select],
   template: `
     <div class="mb-6">
       <h2 class="text-xl font-semibold text-color">Reports</h2>
       <p class="mt-1 text-sm text-muted-color">Export hospital-wide inventory and maintenance reports.</p>
     </div>
 
-    <p-card styleClass="!mb-6 !rounded-2xl !border-surface !bg-surface-0 dark:bg-surface-900">
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <p-select [options]="departmentOptions()" [(ngModel)]="filter.department" optionLabel="label" optionValue="value" placeholder="All departments" [showClear]="true" styleClass="w-full !rounded-xl" />
-        <p-select [options]="statusOptions" [(ngModel)]="filter.status" optionLabel="label" optionValue="value" placeholder="All statuses" [showClear]="true" styleClass="w-full !rounded-xl" />
-        <input type="date" [(ngModel)]="filter.from" class="rounded-xl border border-surface px-3 py-2.5" />
-        <input type="date" [(ngModel)]="filter.to" class="rounded-xl border border-surface px-3 py-2.5" />
-        <input pInputText [(ngModel)]="filter.engineer" placeholder="Engineer ID (optional)" class="rounded-xl border border-surface px-3 py-2.5" />
-        <p-selectbutton [options]="formatOptions" [(ngModel)]="filter.format" optionLabel="label" optionValue="value" styleClass="w-full" />
+    <div class="mb-6 rounded-2xl border border-surface bg-surface-0 dark:bg-surface-900 p-5">
+      <div class="mb-4">
+        <h3 class="text-sm font-medium text-color">Export filters</h3>
+        <p class="mt-1 text-xs text-muted-color">Optional filters applied to all report downloads.</p>
       </div>
-    </p-card>
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-1.5">
+          <label for="report-department" class="text-xs font-medium text-muted-color">Department</label>
+          <p-select
+            inputId="report-department"
+            [options]="departmentOptions()"
+            [(ngModel)]="filter.department"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All departments"
+            [showClear]="true"
+            styleClass="w-full !rounded-xl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="report-status" class="text-xs font-medium text-muted-color">Status</label>
+          <p-select
+            inputId="report-status"
+            [options]="statusOptions"
+            [(ngModel)]="filter.status"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="All statuses"
+            [showClear]="true"
+            styleClass="w-full !rounded-xl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="report-format" class="text-xs font-medium text-muted-color">Format</label>
+          <p-select
+            inputId="report-format"
+            [options]="formatOptions"
+            [(ngModel)]="filter.format"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full !rounded-xl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="report-from" class="text-xs font-medium text-muted-color">From date</label>
+          <input
+            id="report-from"
+            type="date"
+            [(ngModel)]="filter.from"
+            class="w-full rounded-xl border border-surface px-3 py-2.5 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="report-to" class="text-xs font-medium text-muted-color">To date</label>
+          <input
+            id="report-to"
+            type="date"
+            [(ngModel)]="filter.to"
+            class="w-full rounded-xl border border-surface px-3 py-2.5 text-sm"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="report-engineer" class="text-xs font-medium text-muted-color">Engineer ID</label>
+          <input
+            pInputText
+            id="report-engineer"
+            [(ngModel)]="filter.engineer"
+            placeholder="Optional"
+            class="w-full !rounded-xl !border-surface !py-2.5 !text-sm"
+          />
+        </div>
+      </div>
+    </div>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (report of reports; track report.key) {
