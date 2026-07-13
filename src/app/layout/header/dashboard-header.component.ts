@@ -45,11 +45,13 @@ import { ThemeService } from '../../core/services/theme.service';
       (onClick)="sidebar.toggleCollapsed()"
     />
 
-    <div class="min-w-0 flex-1">
-      <p class="truncate text-[10px] font-semibold uppercase tracking-widest text-muted-color">
+    <div class="min-w-0 flex flex-1 flex-col justify-center gap-1">
+      <p
+        class="m-0 truncate text-[10px] font-semibold uppercase leading-none tracking-widest text-muted-color"
+      >
         Dashboard
       </p>
-      <h1 class="truncate text-base font-semibold text-color md:text-lg">
+      <h1 class="m-0 truncate text-base font-semibold leading-tight text-color md:text-lg">
         {{ pageTitle() }}
       </h1>
     </div>
@@ -88,9 +90,9 @@ import { ThemeService } from '../../core/services/theme.service';
           shape="circle"
           styleClass="!size-8 !bg-primary/20 !text-xs !font-semibold !text-primary"
         />
-        <div class="min-w-0 text-left">
-          <p class="truncate text-sm font-medium text-color">{{ user()?.fullName }}</p>
-          <p class="truncate text-xs text-muted-color">{{ roleLabel() }}</p>
+        <div class="flex min-w-0 flex-col gap-1 text-left">
+          <p class="m-0 truncate text-sm font-medium leading-none text-color">{{ user()?.fullName }}</p>
+          <p class="m-0 truncate text-xs leading-tight text-muted-color">{{ roleLabel() }}</p>
         </div>
       </div>
 

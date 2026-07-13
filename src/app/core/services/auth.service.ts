@@ -1,10 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, finalize, map, shareReplay, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/common.model';
-import { AuthUser, LoginRequest, LoginResponse } from '../models/auth.model';
+import { AuthUser, LoginRequest, LoginResponse, TokenPair } from '../models/auth.model';
 import { Role } from '../models/role.enum';
 import { TokenStorageService } from './token-storage.service';
 import { normalizeAuthUser } from '../utils/entity.util';
@@ -18,6 +18,8 @@ export class AuthService {
   private readonly router = inject(Router);
 
   private readonly currentUserSignal = signal<AuthUser | null>(this.readStoredUser());
+
+  private refreshRequest$: Observable<TokenPair> | null = null;
 
   readonly currentUser = computed(() => this.currentUserSignal());
   readonly isAuthenticated = computed(() => !!this.currentUserSignal());
@@ -34,6 +36,34 @@ export class AuthService {
       complete: () => this.clearSessionAndRedirect(),
       error: () => this.clearSessionAndRedirect(),
     });
+  }
+
+  refresh(): Observable<TokenPair> {
+    const refreshToken = this.tokens.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('Missing refresh token'));
+    }
+
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.http
+        .post<ApiResponse<TokenPair>>(`${environment.apiUrl}/auth/refresh`, { refreshToken })
+        .pipe(
+          map((res) => res.data),
+          tap((tokens) => this.tokens.setTokens(tokens)),
+          finalize(() => {
+            this.refreshRequest$ = null;
+          }),
+          shareReplay(1),
+        );
+    }
+
+    return this.refreshRequest$;
+  }
+
+  /** Clears the session when tokens can no longer be refreshed. */
+  sessionExpired(): void {
+    this.refreshRequest$ = null;
+    this.clearSessionAndRedirect();
   }
 
   hasRole(...roles: Role[]): boolean {
