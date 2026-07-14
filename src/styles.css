@@ -369,3 +369,34 @@ html.app-dark input[type='date']::-webkit-calendar-picker-indicator {
 .p-confirmdialog.app-dialog .p-dialog-footer {
   padding: 1rem 1.5rem 1.25rem !important;
 }
+
+/* Detail page — PrimeNG surfaces follow light/dark theme tokens */
+.detail-card.p-card,
+.detail-panel.p-panel {
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 1rem;
+  background: var(--p-content-background);
+  box-shadow: none;
+}
+
+.detail-card.p-card .p-card-body,
+.detail-panel.p-panel .p-panel-content {
+  background: transparent;
+  color: var(--p-text-color);
+}
+
+.detail-panel.p-panel .p-panel-header {
+  background: transparent;
+  border-color: var(--p-content-border-color);
+  color: var(--p-text-color);
+}
+
+.p-datepicker-panel {
+  background: var(--p-datepicker-panel-background, var(--p-overlay-background)) !important;
+  border-color: var(--p-datepicker-panel-border-color, var(--p-overlay-border-color)) !important;
+  color: var(--p-datepicker-panel-color, var(--p-text-color)) !important;
+}
+
+.p-fileupload-choose-button.p-button {
+  border-radius: 0.75rem;
+}
