@@ -18,7 +18,6 @@ import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
 import { Divider } from 'primeng/divider';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-import { Image } from 'primeng/image';
 import { Message } from 'primeng/message';
 import { Panel } from 'primeng/panel';
 import { ProgressSpinner } from 'primeng/progressspinner';
@@ -29,7 +28,6 @@ import { Tag } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
 import { Toolbar } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
-import { environment } from '../../../environments/environment';
 
 import { MaintenanceService } from '../../core/services/maintenance.service';
 import { DepartmentsService } from '../../core/services/departments.service';
@@ -46,6 +44,7 @@ import {
   MaintenanceType,
 } from '../../core/models/maintenance-type.enum';
 import { normalizeDepartment } from '../../core/utils/entity.util';
+import { AssetImageComponent } from '../../shared/components/asset-image/asset-image.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 interface SelectOption<T = string> {
@@ -67,7 +66,6 @@ interface SelectOption<T = string> {
     Dialog,
     Divider,
     FileUpload,
-    Image,
     Message,
     Panel,
     ProgressSpinner,
@@ -78,6 +76,7 @@ interface SelectOption<T = string> {
     Textarea,
     Toolbar,
     TooltipModule,
+    AssetImageComponent,
     StatusBadgeComponent,
   ],
   template: `
@@ -243,14 +242,9 @@ interface SelectOption<T = string> {
           @if (item.photoUrls?.length) {
             <div class="grid grid-cols-2 gap-3">
               @for (url of item.photoUrls; track url) {
-                <p-image
-                  [src]="photoUrl(url)"
-                  alt="Maintenance photo"
-                  width="100%"
-                  [preview]="true"
-                  styleClass="overflow-hidden rounded-xl border border-surface"
-                  imageStyleClass="aspect-square w-full object-cover"
-                />
+                <div class="overflow-hidden rounded-xl border border-surface">
+                  <app-asset-image [src]="url" alt="Maintenance photo" />
+                </div>
               }
             </div>
           } @else if (!uploading()) {
@@ -567,11 +561,6 @@ export class MaintenanceDetailComponent implements OnInit {
 
   formatDateTime(value?: string): string {
     return value ? new Date(value).toLocaleString() : '—';
-  }
-
-  photoUrl(url: string): string {
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `${environment.apiUrl}${url.startsWith('/') ? url : `/${url}`}`;
   }
 
   private formatDateInput(value: Date | null): string {

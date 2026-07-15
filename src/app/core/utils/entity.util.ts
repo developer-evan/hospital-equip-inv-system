@@ -134,6 +134,8 @@ export function normalizeEquipment(raw: unknown): Equipment {
       ? record['manualUrls'].map(String)
       : undefined,
     qrCodeUrl: record['qrCodeUrl'] ? String(record['qrCodeUrl']) : undefined,
+    installationDate: record['installationDate'] as string | undefined,
+    installedBy: record['installedBy'] ? String(record['installedBy']) : undefined,
     createdAt: record['createdAt'] as string | undefined,
     updatedAt: record['updatedAt'] as string | undefined,
   };

@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
@@ -149,9 +150,7 @@ interface SelectOption<T = string> {
             <th class="!min-w-[8rem]">Category</th>
             <th class="!min-w-[9rem]">Department</th>
             <th class="!min-w-[8rem]">Status</th>
-            @if (canEdit() || canDelete()) {
-              <th class="!w-28"></th>
-            }
+            <th class="!w-44">Actions</th>
           </tr>
         </ng-template>
 
@@ -181,44 +180,53 @@ interface SelectOption<T = string> {
             <td>
               <app-status-badge [status]="item.status" />
             </td>
-            @if (canEdit() || canDelete()) {
-              <td>
-                <div class="flex items-center justify-end gap-1">
-                  @if (canEdit()) {
-                    <p-button
-                      type="button"
-                      icon="pi pi-pencil"
-                      [rounded]="true"
-                      [text]="true"
-                      severity="secondary"
-                      styleClass="!size-8 !text-muted-color hover:!text-color"
-                      pTooltip="Edit equipment"
-                      tooltipPosition="left"
-                      (onClick)="openEditDialog(item)"
-                    />
-                  }
-                  @if (canDelete()) {
-                    <p-button
-                      type="button"
-                      icon="pi pi-trash"
-                      [rounded]="true"
-                      [text]="true"
-                      severity="danger"
-                      styleClass="!size-8 !text-muted-color hover:!text-rose-400"
-                      pTooltip="Delete equipment"
-                      tooltipPosition="left"
-                      (onClick)="confirmDelete(item)"
-                    />
-                  }
-                </div>
-              </td>
-            }
+            <td>
+              <div class="flex items-center justify-end gap-1">
+                <p-button
+                  type="button"
+                  icon="pi pi-eye"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  styleClass="!size-8 !text-muted-color hover:!text-color"
+                  pTooltip="View details"
+                  tooltipPosition="left"
+                  (onClick)="viewEquipment(item)"
+                />
+                @if (canEdit()) {
+                  <p-button
+                    type="button"
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="secondary"
+                    styleClass="!size-8 !text-muted-color hover:!text-color"
+                    pTooltip="Edit equipment"
+                    tooltipPosition="left"
+                    (onClick)="openEditDialog(item)"
+                  />
+                }
+                @if (canDelete()) {
+                  <p-button
+                    type="button"
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    styleClass="!size-8 !text-muted-color hover:!text-rose-400"
+                    pTooltip="Delete equipment"
+                    tooltipPosition="left"
+                    (onClick)="confirmDelete(item)"
+                  />
+                }
+              </div>
+            </td>
           </tr>
         </ng-template>
 
         <ng-template #emptymessage>
           <tr>
-            <td [attr.colspan]="canEdit() || canDelete() ? 6 : 5">
+            <td colspan="6">
               <div class="flex flex-col items-center justify-center gap-3 py-14 text-center">
                 <span
                   class="flex size-12 items-center justify-center rounded-2xl border border-surface text-muted-color"
@@ -460,6 +468,7 @@ interface SelectOption<T = string> {
 })
 export class EquipmentComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
   private readonly equipmentService = inject(EquipmentService);
   private readonly departmentsService = inject(DepartmentsService);
   private readonly storeContext = inject(StoreContextService);
@@ -627,6 +636,10 @@ export class EquipmentComponent implements OnInit {
     });
   }
 
+  viewEquipment(item: Equipment): void {
+    this.router.navigate(['/equipment', item.id]);
+  }
+
   departmentLabel(item: Equipment): string {
     const department = item.department;
     if (typeof department === 'string') {
@@ -643,22 +656,33 @@ export class EquipmentComponent implements OnInit {
   private loadEquipment(limit = this.pageSize): void {
     this.loading.set(true);
 
-    this.equipmentService
-      .list({
-        page: this.currentPage,
-        limit,
-        search: this.searchInput().trim() || undefined,
+    const query = {
+      page: this.currentPage,
+      limit,
+      search: this.searchInput().trim() || undefined,
+    };
+
+    let request;
+    if (this.departmentFilter && !this.statusFilter) {
+      request = this.equipmentService.listByDepartment(this.departmentFilter, query);
+    } else if (this.statusFilter && !this.departmentFilter) {
+      request = this.equipmentService.listByStatus(this.statusFilter, query);
+    } else {
+      request = this.equipmentService.list({
+        ...query,
         department: this.departmentFilter ?? undefined,
         status: this.statusFilter ?? undefined,
-      })
-      .subscribe({
-        next: (res) => {
-          this.equipment.set(res.data);
-          this.totalRecords.set((res.meta as PaginationMeta).totalItems ?? res.data.length);
-          this.loading.set(false);
-        },
-        error: () => this.loading.set(false),
       });
+    }
+
+    request.subscribe({
+      next: (res) => {
+        this.equipment.set(res.data);
+        this.totalRecords.set((res.meta as PaginationMeta).totalItems ?? res.data.length);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
   }
 
   private loadDepartments(): void {

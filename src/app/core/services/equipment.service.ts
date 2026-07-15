@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
-import { ApiResponse } from '../models/common.model';
+import { ApiResponse, PaginationQuery } from '../models/common.model';
+import { EquipmentStatus } from '../models/equipment-status.enum';
 import {
   CreateEquipmentDto,
   Equipment,
@@ -19,8 +20,30 @@ export class EquipmentService {
     );
   }
 
+  listByDepartment(
+    departmentId: string,
+    query: PaginationQuery = {},
+  ): Observable<ApiResponse<Equipment[]>> {
+    return this.api
+      .list<Equipment>(`/equipment/department/${departmentId}`, query as Record<string, unknown>)
+      .pipe(map((res) => this.mapList(res)));
+  }
+
+  listByStatus(
+    status: EquipmentStatus,
+    query: PaginationQuery = {},
+  ): Observable<ApiResponse<Equipment[]>> {
+    return this.api
+      .list<Equipment>(`/equipment/status/${status}`, query as Record<string, unknown>)
+      .pipe(map((res) => this.mapList(res)));
+  }
+
   getById(id: string): Observable<ApiResponse<Equipment>> {
     return this.api.get<Equipment>(`/equipment/${id}`).pipe(map((res) => this.mapOne(res)));
+  }
+
+  getQrCode(id: string): Observable<Blob> {
+    return this.api.downloadFile(`/equipment/${id}/qr-code`);
   }
 
   create(dto: CreateEquipmentDto): Observable<ApiResponse<Equipment>> {
@@ -29,6 +52,30 @@ export class EquipmentService {
 
   update(id: string, dto: Partial<CreateEquipmentDto>): Observable<ApiResponse<Equipment>> {
     return this.api.patch<Equipment>(`/equipment/${id}`, dto).pipe(map((res) => this.mapOne(res)));
+  }
+
+  uploadPhotos(id: string, files: File[]): Observable<ApiResponse<Equipment>> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('photos', file));
+
+    return this.api
+      .post<Equipment>(`/equipment/${id}/photos`, formData)
+      .pipe(map((res) => this.mapOne(res)));
+  }
+
+  uploadManual(id: string, file: File): Observable<ApiResponse<Equipment>> {
+    const formData = new FormData();
+    formData.append('manual', file);
+
+    return this.api
+      .post<Equipment>(`/equipment/${id}/manual`, formData)
+      .pipe(map((res) => this.mapOne(res)));
+  }
+
+  regenerateQrCode(id: string): Observable<ApiResponse<Equipment>> {
+    return this.api
+      .post<Equipment>(`/equipment/${id}/qr-code/regenerate`, {})
+      .pipe(map((res) => this.mapOne(res)));
   }
 
   remove(id: string): Observable<void> {

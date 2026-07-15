@@ -400,3 +400,55 @@ html.app-dark input[type='date']::-webkit-calendar-picker-indicator {
 .p-fileupload-choose-button.p-button {
   border-radius: 0.75rem;
 }
+
+/* Asset images — p-image preview mask requires explicit dimensions via CSS (not width="100%") */
+.asset-image .p-image {
+  display: block;
+  position: relative;
+  width: 100%;
+  line-height: 0;
+}
+
+.asset-image .asset-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.asset-image--contain .asset-image__img {
+  aspect-ratio: auto;
+  max-height: 12rem;
+  object-fit: contain;
+  background: var(--p-content-background);
+}
+
+.asset-image .p-image-preview-mask {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: none;
+  cursor: zoom-in;
+  background: color-mix(in srgb, var(--p-mask-background, #000) 35%, transparent) !important;
+}
+
+.asset-image .p-image-preview-mask:hover {
+  background: color-mix(in srgb, var(--p-mask-background, #000) 50%, transparent) !important;
+}
+
+.asset-image .p-image-preview-icon {
+  color: #fff !important;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.p-image-mask.p-overlay-mask {
+  z-index: 1200 !important;
+}
+
+.p-image-mask .p-image-toolbar {
+  z-index: 1201;
+}

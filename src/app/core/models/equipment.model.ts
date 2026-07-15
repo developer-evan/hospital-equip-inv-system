@@ -28,6 +28,8 @@ export interface Equipment {
   photoUrls?: string[];
   manualUrls?: string[];
   qrCodeUrl?: string;
+  installationDate?: string;
+  installedBy?: string;
   createdAt?: string;
   updatedAt?: string;
 }
