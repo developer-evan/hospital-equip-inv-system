@@ -30,11 +30,14 @@ import { Toolbar } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { MaintenanceService } from '../../core/services/maintenance.service';
+import { EquipmentLabelCacheService } from '../../core/services/equipment-label-cache.service';
 import { DepartmentsService } from '../../core/services/departments.service';
+import { UsersService } from '../../core/services/users.service';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiErrorBody } from '../../core/models/common.model';
 import {
+  MaintenanceEngineerRef,
   MaintenanceEquipmentRef,
   MaintenanceRecord,
 } from '../../core/models/maintenance.model';
@@ -42,8 +45,14 @@ import { MaintenanceStatus } from '../../core/models/maintenance-status.enum';
 import {
   MAINTENANCE_TYPE_LABEL,
   MaintenanceType,
+  maintenanceTypeRequiresVerification,
 } from '../../core/models/maintenance-type.enum';
 import { normalizeDepartment } from '../../core/utils/entity.util';
+import {
+  maintenanceVerifierId,
+  maintenanceVerifierRef,
+} from '../../core/utils/maintenance-verifier.util';
+import { switchMap } from 'rxjs';
 import { AssetImageComponent } from '../../shared/components/asset-image/asset-image.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
@@ -119,6 +128,15 @@ interface SelectOption<T = string> {
                 icon="pi pi-check-circle"
                 styleClass="!rounded-xl !border-primary !bg-primary !text-primary-contrast"
                 (onClick)="openCompleteDialog(item)"
+              />
+            }
+            @if (canVerify(item)) {
+              <p-button
+                type="button"
+                label="Verify"
+                icon="pi pi-verified"
+                styleClass="!rounded-xl !border-amber-500/40 !bg-amber-500/15 !text-amber-300"
+                (onClick)="openVerifyDialog(item)"
               />
             }
             @if (canDelete()) {
@@ -204,6 +222,19 @@ interface SelectOption<T = string> {
                 <p class="text-xs font-medium uppercase tracking-wide text-muted-color">Last updated</p>
                 <p class="mt-1 text-sm text-color">{{ formatDateTime(item.updatedAt) }}</p>
               </div>
+              @if (maintenanceTypeRequiresVerification(item.type)) {
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-wide text-muted-color">Verification in charge</p>
+                  <p class="mt-1 text-sm text-color">{{ personName(maintenanceVerifierRef(item)) }}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-medium uppercase tracking-wide text-muted-color">Verified by</p>
+                  <p class="mt-1 text-sm text-color">{{ personName(item.verifiedBy) }}</p>
+                  @if (item.verifiedAt) {
+                    <p class="text-xs text-muted-color">{{ formatDateTime(item.verifiedAt) }}</p>
+                  }
+                </div>
+              }
             </div>
           </p-panel>
 
@@ -214,6 +245,12 @@ interface SelectOption<T = string> {
               <p-message severity="secondary" text="No service report yet." styleClass="!w-full" />
             }
           </p-panel>
+
+          @if (item.verificationNotes) {
+            <p-panel header="Verification notes" [toggleable]="false" styleClass="detail-panel">
+              <p class="text-sm leading-relaxed text-color">{{ item.verificationNotes }}</p>
+            </p-panel>
+          }
         </div>
 
         <p-panel header="Photos" [toggleable]="false" styleClass="detail-panel">
@@ -272,6 +309,20 @@ interface SelectOption<T = string> {
             inputStyleClass="w-full !rounded-xl"
           />
         </div>
+        @if (editForm.controls.type.value && maintenanceTypeRequiresVerification(editForm.controls.type.value)) {
+          <div class="flex flex-col gap-1.5">
+            <label for="editEngineer" class="text-sm font-medium text-color">Verification in charge</label>
+            <p-select
+              inputId="editEngineer"
+              formControlName="engineer"
+              [options]="verificationAssigneeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select verifier"
+              styleClass="w-full !rounded-xl"
+            />
+          </div>
+        }
         <p-divider />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="editVisible = false" />
@@ -305,10 +356,50 @@ interface SelectOption<T = string> {
             class="w-full !rounded-xl"
           ></textarea>
         </div>
+        @if (completeNeedsVerifierPicker()) {
+          <div class="flex flex-col gap-1.5">
+            <label for="detailCompleteVerifier" class="text-sm font-medium text-color">Verification in charge</label>
+            <p-select
+              inputId="detailCompleteVerifier"
+              formControlName="engineer"
+              [options]="verificationAssigneeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select verifier"
+              styleClass="w-full !rounded-xl"
+            />
+            @if (!verificationAssigneeOptions().length) {
+              <p-message severity="warn" styleClass="!w-full" text="Ask an admin to add eligible users under Users." />
+            }
+          </div>
+        } @else if (record(); as item) {
+          @if (maintenanceTypeRequiresVerification(item.type) && maintenanceVerifierId(item)) {
+            <p class="text-sm text-muted-color">
+              Verification in charge:
+              <strong class="text-color">{{ personName(maintenanceVerifierRef(item)) }}</strong>
+            </p>
+          }
+        }
         <p-divider />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="completeVisible = false" />
           <p-button type="submit" label="Complete" icon="pi pi-check" [loading]="saving()" [disabled]="completeForm.invalid || saving()" />
+        </div>
+      </form>
+    </p-dialog>
+
+    <p-dialog [(visible)]="verifyVisible" header="Verify Maintenance" [modal]="true" [draggable]="false" [style]="{ width: '28rem', maxWidth: '95vw' }" styleClass="app-dialog">
+      @if (formError()) { <p-message severity="error" [text]="formError()!" styleClass="!mb-4 !w-full" /> }
+      <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" class="flex flex-col gap-4">
+        <p class="text-sm text-muted-color">Confirm that the recorded work meets requirements before closing this maintenance record.</p>
+        <div class="flex flex-col gap-1.5">
+          <label for="detailVerifyNotes" class="text-sm font-medium text-color">Verification notes <span class="text-muted-color">(optional)</span></label>
+          <textarea pTextarea id="detailVerifyNotes" formControlName="verificationNotes" rows="3" class="w-full !rounded-xl"></textarea>
+        </div>
+        <p-divider />
+        <div class="flex justify-end gap-2">
+          <p-button type="button" label="Cancel" [text]="true" (onClick)="verifyVisible = false" />
+          <p-button type="submit" label="Verify" icon="pi pi-verified" [loading]="saving()" [disabled]="verifyForm.invalid || saving()" />
         </div>
       </form>
     </p-dialog>
@@ -361,10 +452,16 @@ export class MaintenanceDetailComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly maintenanceService = inject(MaintenanceService);
+  private readonly equipmentLabels = inject(EquipmentLabelCacheService);
   private readonly departmentsService = inject(DepartmentsService);
+  private readonly usersService = inject(UsersService);
   private readonly storeContext = inject(StoreContextService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly confirm = inject(ConfirmationService);
+
+  protected readonly maintenanceTypeRequiresVerification = maintenanceTypeRequiresVerification;
+  protected readonly maintenanceVerifierRef = maintenanceVerifierRef;
+  protected readonly maintenanceVerifierId = maintenanceVerifierId;
 
   readonly record = signal<MaintenanceRecord | null>(null);
   readonly loading = signal(true);
@@ -380,7 +477,9 @@ export class MaintenanceDetailComponent implements OnInit {
 
   editVisible = false;
   completeVisible = false;
+  verifyVisible = false;
   historyVisible = false;
+  readonly verificationAssigneeOptions = signal<SelectOption[]>([]);
   private departmentNameById = new Map<string, string>();
 
   readonly typeOptions: SelectOption<MaintenanceType>[] = Object.values(MaintenanceType).map((t) => ({
@@ -391,14 +490,21 @@ export class MaintenanceDetailComponent implements OnInit {
   readonly editForm = this.fb.group({
     type: [MaintenanceType.PREVENTIVE, Validators.required],
     scheduledDate: [null as Date | null, Validators.required],
+    engineer: [''],
   });
   readonly completeForm = this.fb.group({
     performedDate: [new Date(), Validators.required],
     serviceReport: ['', Validators.required],
+    engineer: [''],
+  });
+
+  readonly verifyForm = this.fb.group({
+    verificationNotes: [''],
   });
 
   ngOnInit(): void {
     this.loadDepartments();
+    this.loadVerificationAssignees();
     this.loadRecord(this.id());
   }
 
@@ -407,6 +513,7 @@ export class MaintenanceDetailComponent implements OnInit {
     this.editForm.reset({
       type: item.type,
       scheduledDate: new Date(item.scheduledDate),
+      engineer: maintenanceVerifierId(item) ?? '',
     });
     this.editVisible = true;
   }
@@ -416,8 +523,24 @@ export class MaintenanceDetailComponent implements OnInit {
     this.completeForm.reset({
       performedDate: new Date(),
       serviceReport: '',
+      engineer: maintenanceVerifierId(item) ?? '',
     });
     this.completeVisible = true;
+  }
+
+  openVerifyDialog(_item: MaintenanceRecord): void {
+    this.formError.set(null);
+    this.verifyForm.reset({ verificationNotes: '' });
+    this.verifyVisible = true;
+  }
+
+  completeNeedsVerifierPicker(): boolean {
+    const item = this.record();
+    return (
+      !!item &&
+      maintenanceTypeRequiresVerification(item.type) &&
+      !maintenanceVerifierId(item)
+    );
   }
 
   openHistoryDialog(item: MaintenanceRecord): void {
@@ -436,11 +559,33 @@ export class MaintenanceDetailComponent implements OnInit {
   }
 
   canEdit(item: MaintenanceRecord): boolean {
-    return item.status !== MaintenanceStatus.COMPLETED && this.canCreate();
+    return (
+      item.status !== MaintenanceStatus.COMPLETED &&
+      item.status !== MaintenanceStatus.PENDING_VERIFICATION &&
+      this.canCreate()
+    );
   }
 
   canComplete(item: MaintenanceRecord): boolean {
-    return item.status !== MaintenanceStatus.COMPLETED && this.canCreate();
+    return (
+      item.status !== MaintenanceStatus.COMPLETED &&
+      item.status !== MaintenanceStatus.PENDING_VERIFICATION &&
+      this.canCreate()
+    );
+  }
+
+  canVerify(item: MaintenanceRecord): boolean {
+    if (item.status !== MaintenanceStatus.PENDING_VERIFICATION) return false;
+    const user = this.auth.currentUser();
+    if (!user) return false;
+    if (this.auth.isAdmin()) return true;
+    return maintenanceVerifierId(item) === user.id;
+  }
+
+  personName(ref?: string | MaintenanceEngineerRef): string {
+    if (!ref) return '—';
+    if (typeof ref === 'string') return ref;
+    return ref.fullName || '—';
   }
 
   submitEdit(): void {
@@ -453,6 +598,7 @@ export class MaintenanceDetailComponent implements OnInit {
       .update(item.id, {
         type: raw.type!,
         scheduledDate: this.formatDateInput(raw.scheduledDate),
+        engineer: raw.engineer || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -471,24 +617,54 @@ export class MaintenanceDetailComponent implements OnInit {
     const item = this.record();
     if (!item || this.completeForm.invalid || this.saving()) return;
     const raw = this.completeForm.getRawValue();
+    this.formError.set(null);
+    const needsVerifier = this.completeNeedsVerifierPicker();
+    const engineerId = raw.engineer?.trim();
+    if (needsVerifier && !engineerId) {
+      this.formError.set('Select the verification in charge before completing.');
+      return;
+    }
+    this.saving.set(true);
+    const completePayload = {
+      performedDate: this.formatDateInput(raw.performedDate),
+      serviceReport: raw.serviceReport!,
+    };
+    const complete$ = this.maintenanceService.complete(item.id, completePayload);
+    const request =
+      needsVerifier && engineerId
+        ? this.maintenanceService.update(item.id, { engineer: engineerId }).pipe(switchMap(() => complete$))
+        : complete$;
+
+    request.subscribe({
+      next: (res) => {
+        this.saving.set(false);
+        this.completeVisible = false;
+        this.record.set(res.data);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        this.formError.set(this.resolveError(err));
+      },
+    });
+  }
+
+  submitVerify(): void {
+    const item = this.record();
+    if (!item || this.saving()) return;
     this.saving.set(true);
     this.formError.set(null);
-    this.maintenanceService
-      .complete(item.id, {
-        performedDate: this.formatDateInput(raw.performedDate),
-        serviceReport: raw.serviceReport!,
-      })
-      .subscribe({
-        next: (res) => {
-          this.saving.set(false);
-          this.completeVisible = false;
-          this.record.set(res.data);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.saving.set(false);
-          this.formError.set(this.resolveError(err));
-        },
-      });
+    const notes = this.verifyForm.getRawValue().verificationNotes?.trim();
+    this.maintenanceService.verify(item.id, notes ? { verificationNotes: notes } : {}).subscribe({
+      next: (res) => {
+        this.saving.set(false);
+        this.verifyVisible = false;
+        this.record.set(res.data);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        this.formError.set(this.resolveError(err));
+      },
+    });
   }
 
   confirmDelete(item: MaintenanceRecord): void {
@@ -531,13 +707,11 @@ export class MaintenanceDetailComponent implements OnInit {
   }
 
   equipmentName(item: MaintenanceRecord): string {
-    const eq = item.equipment;
-    return typeof eq === 'string' ? eq : (eq as MaintenanceEquipmentRef).name;
+    return this.equipmentLabels.displayFor(item.equipment).name;
   }
 
   equipmentAsset(item: MaintenanceRecord): string {
-    const eq = item.equipment;
-    return typeof eq === 'object' && eq && 'assetNumber' in eq ? eq.assetNumber ?? '' : '';
+    return this.equipmentLabels.displayFor(item.equipment).assetNumber;
   }
 
   departmentLabel(item: MaintenanceRecord): string {
@@ -592,6 +766,18 @@ export class MaintenanceDetailComponent implements OnInit {
         this.departmentNameById = new Map(departments.map((dept) => [dept.id, dept.name]));
       },
     });
+  }
+
+  private loadVerificationAssignees(): void {
+    if (!this.canCreate()) return;
+    this.usersService.verificationAssigneeOptions().subscribe({
+      next: (options) => this.verificationAssigneeOptions.set(options),
+    });
+  }
+
+  protected userRefId(ref?: string | MaintenanceEngineerRef): string | undefined {
+    if (!ref) return undefined;
+    return typeof ref === 'string' ? ref : ref.id;
   }
 
   private resolveError(err: HttpErrorResponse): string {

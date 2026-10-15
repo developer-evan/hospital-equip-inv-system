@@ -12,6 +12,7 @@ const STATUS_TONE: Record<string, Tone> = {
   SCHEDULED: 'info',
   PENDING_INSTALLATION: 'info',
   OVERDUE: 'danger',
+  PENDING_VERIFICATION: 'warn',
   CONDEMNED: 'danger',
   DECOMMISSIONED: 'secondary',
   INACTIVE: 'secondary',

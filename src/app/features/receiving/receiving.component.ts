@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
@@ -37,6 +38,7 @@ interface SelectOption {
   selector: 'app-receiving',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    RouterLink,
     ReactiveFormsModule,
     Button,
     Dialog,
@@ -88,40 +90,52 @@ interface SelectOption {
         <ng-template #header>
           <tr>
             <th>Asset #</th>
+            <th>Barcode / tag</th>
             <th>Equipment</th>
             <th>Department</th>
             <th>Status</th>
-            @if (canConfirm()) {
-              <th class="!w-36"></th>
-            }
+            <th class="!w-44">Actions</th>
           </tr>
         </ng-template>
         <ng-template #body let-item>
           <tr>
             <td><span class="font-mono text-xs text-primary-300/90">{{ item.assetNumber }}</span></td>
+            <td><span class="font-mono text-xs text-muted-color">{{ item.barcodeTagNumber || '—' }}</span></td>
             <td>
               <p class="font-medium text-color">{{ item.name }}</p>
               <p class="text-xs text-muted-color">{{ item.manufacturer }} · SN {{ item.serialNumber }}</p>
             </td>
             <td class="text-sm text-muted-color">{{ departmentLabel(item) }}</td>
             <td><app-status-badge [status]="item.status" /></td>
-            @if (canConfirm()) {
-              <td class="text-right">
+            <td class="text-right">
+              <div class="flex items-center justify-end gap-1">
                 <p-button
                   type="button"
-                  label="Confirm"
-                  icon="pi pi-check"
-                  size="small"
-                  styleClass="!rounded-lg !border-primary/30 !bg-primary/15 !text-primary-300"
-                  (onClick)="openConfirmDialog(item)"
+                  icon="pi pi-eye"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  styleClass="!size-8 !text-muted-color hover:!text-color"
+                  pTooltip="View details"
+                  [routerLink]="['/equipment', item.id]"
                 />
-              </td>
-            }
+                @if (canConfirm()) {
+                  <p-button
+                    type="button"
+                    label="Confirm"
+                    icon="pi pi-check"
+                    size="small"
+                    styleClass="!rounded-lg !border-primary/30 !bg-primary/15 !text-primary-300"
+                    (onClick)="openConfirmDialog(item)"
+                  />
+                }
+              </div>
+            </td>
           </tr>
         </ng-template>
         <ng-template #emptymessage>
           <tr>
-            <td [attr.colspan]="canConfirm() ? 5 : 4">
+            <td colspan="6">
               <div class="py-14 text-center text-sm text-muted-color">No pending installations.</div>
             </td>
           </tr>
@@ -146,6 +160,7 @@ interface SelectOption {
         <input pInputText formControlName="manufacturer" placeholder="Manufacturer *" class="!rounded-xl !border-surface !py-2.5" />
         <input pInputText formControlName="model" placeholder="Model" class="!rounded-xl !border-surface !py-2.5" />
         <input pInputText formControlName="serialNumber" placeholder="Serial number *" class="!rounded-xl !border-surface !py-2.5" />
+        <input pInputText formControlName="barcodeTagNumber" placeholder="Barcode / tag number *" class="sm:col-span-2 !rounded-xl !border-surface !py-2.5" />
         <p-select formControlName="department" [options]="departmentOptions()" optionLabel="label" optionValue="value" placeholder="Department *" styleClass="sm:col-span-2 w-full !rounded-xl" />
         <div class="sm:col-span-2 flex justify-end gap-2 border-t border-surface pt-4">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="registerVisible = false" />
@@ -209,6 +224,7 @@ export class ReceivingComponent implements OnInit {
     manufacturer: ['', Validators.required],
     model: [''],
     serialNumber: ['', Validators.required],
+    barcodeTagNumber: ['', Validators.required],
     department: ['', Validators.required],
   });
 
@@ -228,7 +244,15 @@ export class ReceivingComponent implements OnInit {
 
   openRegisterDialog(): void {
     this.formError.set(null);
-    this.registerForm.reset({ name: '', category: '', manufacturer: '', model: '', serialNumber: '', department: '' });
+    this.registerForm.reset({
+      name: '',
+      category: '',
+      manufacturer: '',
+      model: '',
+      serialNumber: '',
+      barcodeTagNumber: '',
+      department: '',
+    });
     this.registerVisible = true;
   }
 
@@ -255,6 +279,7 @@ export class ReceivingComponent implements OnInit {
       manufacturer: raw.manufacturer.trim(),
       model: raw.model.trim() || undefined,
       serialNumber: raw.serialNumber.trim(),
+      barcodeTagNumber: raw.barcodeTagNumber.trim(),
       department: raw.department,
     };
     this.receivingService.register(payload).subscribe({

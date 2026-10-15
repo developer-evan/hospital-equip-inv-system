@@ -42,8 +42,10 @@ export class EquipmentService {
     return this.api.get<Equipment>(`/equipment/${id}`).pipe(map((res) => this.mapOne(res)));
   }
 
-  getQrCode(id: string): Observable<Blob> {
-    return this.api.downloadFile(`/equipment/${id}/qr-code`);
+  getQrCodeUrl(id: string): Observable<string> {
+    return this.api.get<{ qrCodeUrl: string }>(`/equipment/${id}/qr-code`).pipe(
+      map((res) => res.data.qrCodeUrl),
+    );
   }
 
   create(dto: CreateEquipmentDto): Observable<ApiResponse<Equipment>> {

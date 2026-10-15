@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -25,12 +25,15 @@ import { Textarea } from 'primeng/textarea';
 
 import { MaintenanceService } from '../../core/services/maintenance.service';
 import { EquipmentService } from '../../core/services/equipment.service';
+import { EquipmentLabelCacheService } from '../../core/services/equipment-label-cache.service';
 import { DepartmentsService } from '../../core/services/departments.service';
+import { UsersService } from '../../core/services/users.service';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiErrorBody, PaginationMeta } from '../../core/models/common.model';
 import {
   MAINTENANCE_STATUS_LABEL,
+  MaintenanceEngineerRef,
   MaintenanceEquipmentRef,
   MaintenanceRecord,
 } from '../../core/models/maintenance.model';
@@ -38,8 +41,14 @@ import { MaintenanceStatus } from '../../core/models/maintenance-status.enum';
 import {
   MAINTENANCE_TYPE_LABEL,
   MaintenanceType,
+  maintenanceTypeRequiresVerification,
 } from '../../core/models/maintenance-type.enum';
 import { normalizeDepartment } from '../../core/utils/entity.util';
+import {
+  maintenanceVerifierId,
+  maintenanceVerifierRef,
+} from '../../core/utils/maintenance-verifier.util';
+import { switchMap } from 'rxjs';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 interface SelectOption<T = string> {
@@ -54,6 +63,7 @@ type MaintenanceViewMode = 'records' | 'schedule';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ConfirmationService],
   imports: [
+    RouterLink,
     FormsModule,
     ReactiveFormsModule,
     Button,
@@ -133,6 +143,9 @@ type MaintenanceViewMode = 'records' | 'schedule';
                 @if (canComplete(row)) {
                   <p-button type="button" icon="pi pi-check-circle" [rounded]="true" [text]="true" severity="success" styleClass="!size-8 !text-muted-color hover:!text-emerald-400" pTooltip="Mark complete" tooltipPosition="left" (onClick)="openCompleteDialog(row)" />
                 }
+                @if (canVerify(row)) {
+                  <p-button type="button" icon="pi pi-verified" [rounded]="true" [text]="true" severity="warn" styleClass="!size-8 !text-muted-color hover:!text-amber-400" pTooltip="Verify work" tooltipPosition="left" (onClick)="openVerifyDialog(row)" />
+                }
                 @if (canDelete()) {
                   <p-button type="button" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" styleClass="!size-8 !text-muted-color hover:!text-rose-400" pTooltip="Delete" tooltipPosition="left" (onClick)="confirmDelete(row)" />
                 }
@@ -161,6 +174,18 @@ type MaintenanceViewMode = 'records' | 'schedule';
           <label for="createScheduled" class="text-sm font-medium text-color">Scheduled date</label>
           <p-datepicker inputId="createScheduled" formControlName="scheduledDate" [showIcon]="true" dateFormat="yy-mm-dd" styleClass="w-full" inputStyleClass="w-full !rounded-xl" />
         </div>
+        @if (createForm.controls.type.value && maintenanceTypeRequiresVerification(createForm.controls.type.value)) {
+          <div class="flex flex-col gap-1.5">
+            <label for="createVerifier" class="text-sm font-medium text-color">Verification in charge</label>
+            <p-select inputId="createVerifier" formControlName="engineer" [options]="verificationAssigneeOptions()" optionLabel="label" optionValue="value" placeholder="Select verifier" styleClass="w-full !rounded-xl" />
+            @if (!verificationAssigneeOptions().length) {
+              <p-message severity="warn" styleClass="!w-full" text="No verifiers listed yet. Ask an administrator to add active users under Users, or pick from the full user list if you are an admin." />
+              @if (auth.isAdmin()) {
+                <a routerLink="/users" class="text-sm text-primary hover:underline" (click)="createVisible = false">Open Users →</a>
+              }
+            }
+          </div>
+        }
         <p-divider />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="createVisible = false" />
@@ -182,6 +207,28 @@ type MaintenanceViewMode = 'records' | 'schedule';
           <label for="editScheduled" class="text-sm font-medium text-color">Scheduled date</label>
           <p-datepicker inputId="editScheduled" formControlName="scheduledDate" [showIcon]="true" dateFormat="yy-mm-dd" styleClass="w-full" inputStyleClass="w-full !rounded-xl" />
         </div>
+        @if (editForm.controls.type.value && maintenanceTypeRequiresVerification(editForm.controls.type.value)) {
+          <div class="rounded-xl border border-surface bg-surface-50 px-3 py-2.5 dark:bg-surface-800">
+            <p class="text-xs font-medium text-muted-color">Verification in charge</p>
+            @if (selected() && maintenanceVerifierId(selected()!)) {
+              <p class="mt-1 text-sm text-color">{{ personName(maintenanceVerifierRef(selected()!)) }}</p>
+            } @else {
+              <p class="mt-1 text-sm text-muted-color">Not assigned yet</p>
+              <p class="mt-2 text-xs text-muted-color">
+                Choose a verifier when scheduling, on <strong class="text-color">Complete</strong>, or set below and save.
+              </p>
+              <p-select
+                inputId="editEngineer"
+                formControlName="engineer"
+                [options]="verificationAssigneeOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Assign verifier"
+                styleClass="mt-2 w-full !rounded-xl"
+              />
+            }
+          </div>
+        }
         <p-divider />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="editVisible = false" />
@@ -201,10 +248,43 @@ type MaintenanceViewMode = 'records' | 'schedule';
           <label for="completeReport" class="text-sm font-medium text-color">Service report</label>
           <textarea pTextarea id="completeReport" formControlName="serviceReport" rows="4" placeholder="Describe work performed…" class="w-full !rounded-xl"></textarea>
         </div>
+        @if (completeNeedsVerifierPicker()) {
+          <div class="flex flex-col gap-1.5">
+            <label for="completeVerifier" class="text-sm font-medium text-color">Verification in charge</label>
+            <p-select inputId="completeVerifier" formControlName="engineer" [options]="verificationAssigneeOptions()" optionLabel="label" optionValue="value" placeholder="Select verifier" styleClass="w-full !rounded-xl" />
+            @if (!verificationAssigneeOptions().length) {
+              <p-message severity="warn" styleClass="!w-full" text="Add a verifier via Edit on this record, or ask an admin to create active users who can sign off PM/calibration work." />
+            }
+          </div>
+        } @else if (selected() && maintenanceTypeRequiresVerification(selected()!.type)) {
+          <p class="text-sm text-muted-color">
+            Verification in charge: <strong class="text-color">{{ personName(maintenanceVerifierRef(selected()!)) }}</strong>
+          </p>
+        }
         <p-divider />
         <div class="flex justify-end gap-2">
           <p-button type="button" label="Cancel" [text]="true" (onClick)="completeVisible = false" />
           <p-button type="submit" label="Complete" icon="pi pi-check" [loading]="saving()" [disabled]="completeForm.invalid || saving()" />
+        </div>
+      </form>
+    </p-dialog>
+
+    <p-dialog [(visible)]="verifyVisible" header="Verify Maintenance" [modal]="true" [style]="{ width: '28rem', maxWidth: '95vw' }" styleClass="app-dialog">
+      @if (formError()) { <p-message severity="error" [text]="formError()!" styleClass="!mb-4 !w-full" /> }
+      <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" class="flex flex-col gap-4">
+        <p class="text-sm text-muted-color">
+          Confirm that preventive/calibration work for
+          <strong class="text-color">{{ selected() ? equipmentName(selected()!) : '' }}</strong>
+          meets requirements.
+        </p>
+        <div class="flex flex-col gap-1.5">
+          <label for="verifyNotes" class="text-sm font-medium text-color">Verification notes <span class="text-muted-color">(optional)</span></label>
+          <textarea pTextarea id="verifyNotes" formControlName="verificationNotes" rows="3" placeholder="Optional sign-off notes…" class="w-full !rounded-xl"></textarea>
+        </div>
+        <p-divider />
+        <div class="flex justify-end gap-2">
+          <p-button type="button" label="Cancel" [text]="true" (onClick)="verifyVisible = false" />
+          <p-button type="submit" label="Verify" icon="pi pi-verified" [loading]="saving()" [disabled]="verifyForm.invalid || saving()" />
         </div>
       </form>
     </p-dialog>
@@ -245,12 +325,19 @@ type MaintenanceViewMode = 'records' | 'schedule';
 export class MaintenanceComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly maintenanceService = inject(MaintenanceService);
   private readonly equipmentService = inject(EquipmentService);
+  private readonly equipmentLabels = inject(EquipmentLabelCacheService);
   private readonly departmentsService = inject(DepartmentsService);
+  private readonly usersService = inject(UsersService);
   private readonly storeContext = inject(StoreContextService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly confirm = inject(ConfirmationService);
+
+  protected readonly maintenanceTypeRequiresVerification = maintenanceTypeRequiresVerification;
+  protected readonly maintenanceVerifierRef = maintenanceVerifierRef;
+  protected readonly maintenanceVerifierId = maintenanceVerifierId;
 
   protected readonly pageSize = 10;
   readonly records = signal<MaintenanceRecord[]>([]);
@@ -261,6 +348,7 @@ export class MaintenanceComponent implements OnInit {
   readonly formError = signal<string | null>(null);
   readonly equipmentOptions = signal<SelectOption[]>([]);
   readonly equipmentFilterOptions = signal<SelectOption[]>([]);
+  readonly verificationAssigneeOptions = signal<SelectOption[]>([]);
   readonly selected = signal<MaintenanceRecord | null>(null);
   readonly historyRecords = signal<MaintenanceRecord[]>([]);
   readonly historyEquipment = signal('');
@@ -280,9 +368,11 @@ export class MaintenanceComponent implements OnInit {
   createVisible = false;
   editVisible = false;
   completeVisible = false;
+  verifyVisible = false;
   historyVisible = false;
   private currentPage = 1;
   private departmentNameById = new Map<string, string>();
+  private prefillEquipmentId: string | null = null;
 
   readonly typeOptions: SelectOption<MaintenanceType>[] = Object.values(MaintenanceType).map((t) => ({
     label: MAINTENANCE_TYPE_LABEL[t],
@@ -297,19 +387,28 @@ export class MaintenanceComponent implements OnInit {
     equipment: ['', Validators.required],
     type: [MaintenanceType.PREVENTIVE, Validators.required],
     scheduledDate: [new Date(), Validators.required],
+    engineer: [''],
   });
   readonly editForm = this.fb.group({
     type: [MaintenanceType.PREVENTIVE, Validators.required],
     scheduledDate: [null as Date | null, Validators.required],
+    engineer: [''],
   });
   readonly completeForm = this.fb.group({
     performedDate: [new Date(), Validators.required],
     serviceReport: ['', Validators.required],
+    engineer: [''],
+  });
+
+  readonly verifyForm = this.fb.group({
+    verificationNotes: [''],
   });
 
   ngOnInit(): void {
+    this.prefillEquipmentId = this.route.snapshot.queryParamMap.get('equipment');
     this.loadEquipmentOptions();
     this.loadDepartments();
+    this.loadVerificationAssignees();
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
@@ -333,6 +432,7 @@ export class MaintenanceComponent implements OnInit {
       equipment: '',
       type: MaintenanceType.PREVENTIVE,
       scheduledDate: new Date(),
+      engineer: '',
     });
     this.createVisible = true;
   }
@@ -343,6 +443,7 @@ export class MaintenanceComponent implements OnInit {
     this.editForm.reset({
       type: row.type,
       scheduledDate: new Date(row.scheduledDate),
+      engineer: maintenanceVerifierId(row) ?? '',
     });
     this.editVisible = true;
   }
@@ -353,8 +454,21 @@ export class MaintenanceComponent implements OnInit {
     this.completeForm.reset({
       performedDate: new Date(),
       serviceReport: '',
+      engineer: maintenanceVerifierId(row) ?? '',
     });
     this.completeVisible = true;
+  }
+
+  openVerifyDialog(row: MaintenanceRecord): void {
+    this.selected.set(row);
+    this.formError.set(null);
+    this.verifyForm.reset({ verificationNotes: '' });
+    this.verifyVisible = true;
+  }
+
+  completeNeedsVerifierPicker(): boolean {
+    const row = this.selected();
+    return !!row && maintenanceTypeRequiresVerification(row.type) && !maintenanceVerifierId(row);
   }
 
   viewRecord(row: MaintenanceRecord): void {
@@ -377,23 +491,55 @@ export class MaintenanceComponent implements OnInit {
   }
 
   canEdit(row: MaintenanceRecord): boolean {
-    return row.status !== MaintenanceStatus.COMPLETED && this.canCreate();
+    return (
+      row.status !== MaintenanceStatus.COMPLETED &&
+      row.status !== MaintenanceStatus.PENDING_VERIFICATION &&
+      this.canCreate()
+    );
   }
 
   canComplete(row: MaintenanceRecord): boolean {
-    return row.status !== MaintenanceStatus.COMPLETED && this.canCreate();
+    return (
+      row.status !== MaintenanceStatus.COMPLETED &&
+      row.status !== MaintenanceStatus.PENDING_VERIFICATION &&
+      this.canCreate()
+    );
+  }
+
+  canVerify(row: MaintenanceRecord): boolean {
+    if (row.status !== MaintenanceStatus.PENDING_VERIFICATION) return false;
+    const user = this.auth.currentUser();
+    if (!user) return false;
+    if (this.auth.isAdmin()) return true;
+    return maintenanceVerifierId(row) === user.id;
+  }
+
+  personName(ref?: string | MaintenanceEngineerRef): string {
+    if (!ref) return '—';
+    if (typeof ref === 'string') return ref;
+    return ref.fullName || '—';
+  }
+
+  protected userRefId(ref?: string | MaintenanceEngineerRef): string | undefined {
+    if (!ref) return undefined;
+    return typeof ref === 'string' ? ref : ref.id;
   }
 
   submitCreate(): void {
     if (this.createForm.invalid || this.saving()) return;
     const raw = this.createForm.getRawValue();
-    this.saving.set(true);
     this.formError.set(null);
+    if (maintenanceTypeRequiresVerification(raw.type!) && !raw.engineer) {
+      this.formError.set('Verification in charge is required for preventive and calibration work.');
+      return;
+    }
+    this.saving.set(true);
     this.maintenanceService
       .create({
         equipment: raw.equipment!,
         type: raw.type!,
         scheduledDate: this.formatDateInput(raw.scheduledDate),
+        engineer: raw.engineer || undefined,
       })
       .subscribe({
       next: () => {
@@ -418,6 +564,7 @@ export class MaintenanceComponent implements OnInit {
       .update(row.id, {
         type: raw.type!,
         scheduledDate: this.formatDateInput(raw.scheduledDate),
+        engineer: raw.engineer || undefined,
       })
       .subscribe({
       next: () => {
@@ -436,17 +583,47 @@ export class MaintenanceComponent implements OnInit {
     const row = this.selected();
     if (!row || this.completeForm.invalid || this.saving()) return;
     const raw = this.completeForm.getRawValue();
-    this.saving.set(true);
     this.formError.set(null);
-    this.maintenanceService
-      .complete(row.id, {
-        performedDate: this.formatDateInput(raw.performedDate),
-        serviceReport: raw.serviceReport!,
-      })
-      .subscribe({
+    const needsVerifier = this.completeNeedsVerifierPicker();
+    const engineerId = raw.engineer?.trim();
+    if (needsVerifier && !engineerId) {
+      this.formError.set('Select the verification in charge before completing.');
+      return;
+    }
+    this.saving.set(true);
+    const completePayload = {
+      performedDate: this.formatDateInput(raw.performedDate),
+      serviceReport: raw.serviceReport!,
+    };
+    const complete$ = this.maintenanceService.complete(row.id, completePayload);
+    const request =
+      needsVerifier && engineerId
+        ? this.maintenanceService.update(row.id, { engineer: engineerId }).pipe(switchMap(() => complete$))
+        : complete$;
+
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.completeVisible = false;
+        this.loadRecords();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.saving.set(false);
+        this.formError.set(this.resolveError(err));
+      },
+    });
+  }
+
+  submitVerify(): void {
+    const row = this.selected();
+    if (!row || this.saving()) return;
+    this.saving.set(true);
+    this.formError.set(null);
+    const notes = this.verifyForm.getRawValue().verificationNotes?.trim();
+    this.maintenanceService.verify(row.id, notes ? { verificationNotes: notes } : {}).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.verifyVisible = false;
         this.loadRecords();
       },
       error: (err: HttpErrorResponse) => {
@@ -477,13 +654,11 @@ export class MaintenanceComponent implements OnInit {
   }
 
   equipmentName(row: MaintenanceRecord): string {
-    const eq = row.equipment;
-    return typeof eq === 'string' ? eq : (eq as MaintenanceEquipmentRef).name;
+    return this.equipmentLabels.displayFor(row.equipment).name;
   }
 
   equipmentAsset(row: MaintenanceRecord): string {
-    const eq = row.equipment;
-    return typeof eq === 'object' && eq && 'assetNumber' in eq ? eq.assetNumber ?? '' : '';
+    return this.equipmentLabels.displayFor(row.equipment).assetNumber;
   }
 
   departmentLabel(row: MaintenanceRecord): string {
@@ -544,6 +719,18 @@ export class MaintenanceComponent implements OnInit {
         }));
         this.equipmentOptions.set(options);
         this.equipmentFilterOptions.set(options);
+
+        const prefill = this.prefillEquipmentId;
+        if (prefill && options.some((o) => o.value === prefill)) {
+          this.equipmentFilter = prefill;
+          this.prefillEquipmentId = null;
+          if (this.canCreate()) {
+            this.createForm.patchValue({ equipment: prefill });
+            this.createVisible = true;
+          }
+          this.currentPage = 1;
+          this.loadRecords();
+        }
       },
     });
   }
@@ -554,6 +741,13 @@ export class MaintenanceComponent implements OnInit {
         const departments = res.data.map((dept) => normalizeDepartment(dept)).filter((d) => !!d.id);
         this.departmentNameById = new Map(departments.map((dept) => [dept.id, dept.name]));
       },
+    });
+  }
+
+  private loadVerificationAssignees(): void {
+    if (!this.canCreate()) return;
+    this.usersService.verificationAssigneeOptions().subscribe({
+      next: (options) => this.verificationAssigneeOptions.set(options),
     });
   }
 

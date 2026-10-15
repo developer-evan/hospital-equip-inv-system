@@ -15,6 +15,7 @@ export interface Equipment {
   manufacturer: string;
   model?: string;
   serialNumber: string;
+  barcodeTagNumber: string;
   status: EquipmentStatus;
   department: string | EquipmentDepartmentRef;
   roomLocation?: string;
@@ -40,6 +41,7 @@ export interface CreateEquipmentDto {
   manufacturer: string;
   model?: string;
   serialNumber: string;
+  barcodeTagNumber: string;
   department: string;
   roomLocation?: string;
   supplier?: string;
@@ -54,6 +56,7 @@ export interface CreateEquipmentDto {
 export interface EquipmentListQuery extends PaginationQuery {
   department?: string;
   status?: EquipmentStatus;
+  category?: string;
 }
 
 export const EQUIPMENT_STATUS_LABEL: Record<EquipmentStatus, string> = {

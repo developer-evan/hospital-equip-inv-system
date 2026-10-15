@@ -118,7 +118,7 @@ interface SelectOption<T = string> {
               </p-iconfield>
             </div>
 
-            <div class="flex flex-col gap-2 sm:flex-row">
+            <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <p-select
                 [options]="departmentFilterOptions()"
                 [(ngModel)]="departmentFilter"
@@ -138,6 +138,14 @@ interface SelectOption<T = string> {
                 [showClear]="true"
                 styleClass="w-full sm:w-56 !rounded-xl"
                 (onChange)="onFiltersChanged()"
+              />
+              <input
+                pInputText
+                type="search"
+                placeholder="Filter by category…"
+                class="w-full sm:w-48 !rounded-xl !border-surface !py-2 !text-sm"
+                [value]="categoryFilter()"
+                (input)="onCategoryInput($event)"
               />
             </div>
           </div>
@@ -320,6 +328,17 @@ interface SelectOption<T = string> {
           </div>
 
           <div class="flex flex-col gap-1.5 sm:col-span-2">
+            <label for="eqBarcodeTag" class="text-sm font-medium text-color">Barcode / tag number</label>
+            <input
+              pInputText
+              id="eqBarcodeTag"
+              formControlName="barcodeTagNumber"
+              placeholder="TAG-2026-004521"
+              class="w-full !rounded-xl !border-surface !py-2.5"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5 sm:col-span-2">
             <label for="eqDepartment" class="text-sm font-medium text-color">Department</label>
             <p-select
               inputId="eqDepartment"
@@ -476,6 +495,7 @@ export class EquipmentComponent implements OnInit {
   private readonly confirm = inject(ConfirmationService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly searchChanges$ = new Subject<string>();
+  private readonly categoryChanges$ = new Subject<string>();
 
   protected readonly pageSize = 10;
 
@@ -486,6 +506,7 @@ export class EquipmentComponent implements OnInit {
   readonly departmentsLoading = signal(false);
   readonly formError = signal<string | null>(null);
   readonly searchInput = signal('');
+  readonly categoryFilter = signal('');
   readonly editing = signal<Equipment | null>(null);
   readonly departmentFormOptions = signal<SelectOption[]>([]);
   readonly departmentFilterOptions = signal<SelectOption[]>([]);
@@ -512,6 +533,7 @@ export class EquipmentComponent implements OnInit {
     manufacturer: ['', Validators.required],
     model: [''],
     serialNumber: ['', Validators.required],
+    barcodeTagNumber: ['', Validators.required],
     department: ['', Validators.required],
     roomLocation: [''],
     supplier: [''],
@@ -536,6 +558,14 @@ export class EquipmentComponent implements OnInit {
         this.currentPage = 1;
         this.loadEquipment();
       });
+
+    this.categoryChanges$
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((term) => {
+        this.categoryFilter.set(term);
+        this.currentPage = 1;
+        this.loadEquipment();
+      });
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
@@ -545,6 +575,10 @@ export class EquipmentComponent implements OnInit {
 
   onSearchInput(event: Event): void {
     this.searchChanges$.next((event.target as HTMLInputElement).value);
+  }
+
+  onCategoryInput(event: Event): void {
+    this.categoryChanges$.next((event.target as HTMLInputElement).value);
   }
 
   onFiltersChanged(): void {
@@ -571,6 +605,7 @@ export class EquipmentComponent implements OnInit {
       manufacturer: item.manufacturer,
       model: item.model ?? '',
       serialNumber: item.serialNumber,
+      barcodeTagNumber: item.barcodeTagNumber ?? '',
       department: this.departmentId(item),
       roomLocation: item.roomLocation ?? '',
       supplier: item.supplier ?? '',
@@ -656,26 +691,16 @@ export class EquipmentComponent implements OnInit {
   private loadEquipment(limit = this.pageSize): void {
     this.loading.set(true);
 
-    const query = {
-      page: this.currentPage,
-      limit,
-      search: this.searchInput().trim() || undefined,
-    };
-
-    let request;
-    if (this.departmentFilter && !this.statusFilter) {
-      request = this.equipmentService.listByDepartment(this.departmentFilter, query);
-    } else if (this.statusFilter && !this.departmentFilter) {
-      request = this.equipmentService.listByStatus(this.statusFilter, query);
-    } else {
-      request = this.equipmentService.list({
-        ...query,
+    this.equipmentService
+      .list({
+        page: this.currentPage,
+        limit,
+        search: this.searchInput().trim() || undefined,
         department: this.departmentFilter ?? undefined,
         status: this.statusFilter ?? undefined,
-      });
-    }
-
-    request.subscribe({
+        category: this.categoryFilter().trim() || undefined,
+      })
+      .subscribe({
       next: (res) => {
         this.equipment.set(res.data);
         this.totalRecords.set((res.meta as PaginationMeta).totalItems ?? res.data.length);
@@ -713,6 +738,7 @@ export class EquipmentComponent implements OnInit {
       manufacturer: raw.manufacturer.trim(),
       model: raw.model.trim() || undefined,
       serialNumber: raw.serialNumber.trim(),
+      barcodeTagNumber: raw.barcodeTagNumber.trim(),
       department: raw.department,
       roomLocation: raw.roomLocation.trim() || undefined,
       supplier: raw.supplier.trim() || undefined,
@@ -734,6 +760,7 @@ export class EquipmentComponent implements OnInit {
       manufacturer: '',
       model: '',
       serialNumber: '',
+      barcodeTagNumber: '',
       department: '',
       roomLocation: '',
       supplier: '',

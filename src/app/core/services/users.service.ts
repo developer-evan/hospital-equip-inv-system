@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { ApiService } from './api.service';
+import { AuthService } from './auth.service';
 import { ApiResponse, PaginationQuery } from '../models/common.model';
+import { Role, ROLE_LABEL } from '../models/role.enum';
 import {
   AdminResetPasswordDto,
   CreateUserDto,
@@ -12,9 +14,16 @@ import { normalizeUser, normalizeUserProfile } from '../utils/entity.util';
 import { ChangePasswordDto } from '../models/profile.model';
 import { UserProfile } from '../models/profile.model';
 
+const VERIFIER_ROLES = new Set<Role>([
+  Role.ADMINISTRATOR,
+  Role.BIOMEDICAL_ENGINEER,
+  Role.DEPARTMENT_USER,
+]);
+
 @Injectable({ providedIn: 'root' })
 export class UsersService {
   private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
 
   list(query: PaginationQuery): Observable<ApiResponse<User[]>> {
     return this.api.list<User>('/users', query).pipe(map((res) => this.mapUsers(res)));
@@ -46,6 +55,18 @@ export class UsersService {
     return this.api.delete(`/users/${id}`);
   }
 
+  /**
+   * Dropdown options for maintenance “verification in charge” (API field: `engineer`).
+   * Uses documented `GET /users` when allowed; otherwise falls back to the signed-in user.
+   */
+  verificationAssigneeOptions(): Observable<Array<{ label: string; value: string }>> {
+    return this.list({ page: 1, limit: 100 }).pipe(
+      map((res) => this.mapVerifierOptions(res.data ?? [])),
+      map((options) => (options.length ? options : this.currentUserOption())),
+      catchError(() => of(this.currentUserOption())),
+    );
+  }
+
   getMe(): Observable<ApiResponse<UserProfile>> {
     return this.api.get<UserProfile>('/users/me').pipe(
       map((res) => ({ ...res, data: normalizeUserProfile(res.data) })),
@@ -54,6 +75,21 @@ export class UsersService {
 
   changeMyPassword(dto: ChangePasswordDto): Observable<ApiResponse<void>> {
     return this.api.patch<void>('/users/me/password', dto);
+  }
+
+  private mapVerifierOptions(users: User[]): Array<{ label: string; value: string }> {
+    return users
+      .filter((user) => user.isActive !== false && VERIFIER_ROLES.has(user.role))
+      .map((user) => ({
+        label: `${user.fullName} (${ROLE_LABEL[user.role]})`,
+        value: user.id,
+      }));
+  }
+
+  private currentUserOption(): Array<{ label: string; value: string }> {
+    const user = this.auth.currentUser();
+    if (!user) return [];
+    return [{ label: `${user.fullName} (${ROLE_LABEL[user.role]})`, value: user.id }];
   }
 
   private mapUsers(res: ApiResponse<User[]>): ApiResponse<User[]> {

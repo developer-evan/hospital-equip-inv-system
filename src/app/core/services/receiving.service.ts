@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
-import { ApiResponse } from '../models/common.model';
+import { ApiResponse, PaginationQuery } from '../models/common.model';
 import { CreateEquipmentDto, Equipment } from '../models/equipment.model';
 import { EquipmentStatus } from '../models/equipment-status.enum';
+import { ReceivingHistoryEntry } from '../models/receiving-history.model';
 import { normalizeEquipment } from '../utils/entity.util';
 
 export interface ConfirmInstallationDto {
@@ -12,7 +13,7 @@ export interface ConfirmInstallationDto {
 }
 
 export interface ChangeEquipmentStatusDto {
-  status: EquipmentStatus;
+  toStatus: EquipmentStatus;
   note?: string;
 }
 
@@ -40,7 +41,17 @@ export class ReceivingService {
     dto: ChangeEquipmentStatusDto,
   ): Observable<ApiResponse<Equipment>> {
     return this.api
-      .patch<Equipment>(`/receiving/${equipmentId}/change-status`, dto)
+      .patch<Equipment>(`/receiving/${equipmentId}/status`, dto)
       .pipe(map((res) => ({ ...res, data: normalizeEquipment(res.data) })));
+  }
+
+  getHistory(
+    equipmentId: string,
+    query: PaginationQuery = {},
+  ): Observable<ApiResponse<ReceivingHistoryEntry[]>> {
+    return this.api.list<ReceivingHistoryEntry>(
+      `/receiving/${equipmentId}/history`,
+      query as Record<string, unknown>,
+    );
   }
 }

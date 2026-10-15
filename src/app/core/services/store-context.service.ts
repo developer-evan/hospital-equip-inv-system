@@ -13,6 +13,9 @@ type Permission =
   | 'orders:create'
   | 'equipment:create'
   | 'equipment:edit'
+  | 'equipment:media'
+  | 'equipment:status'
+  | 'equipment:qr'
   | 'users:manage'
   | 'reports:view'
   | 'departments:write'
@@ -26,19 +29,23 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'orders:create',
     'equipment:create',
     'equipment:edit',
+    'equipment:media',
+    'equipment:status',
+    'equipment:qr',
     'users:manage',
     'reports:view',
     'departments:write',
     'receiving:register',
     'maintenance:create',
   ],
-  [Role.STORE_OFFICER]: [
-    'equipment:create',
+  [Role.STORE_OFFICER]: ['equipment:create', 'equipment:media', 'receiving:register'],
+  [Role.BIOMEDICAL_ENGINEER]: [
     'equipment:edit',
-    'receiving:register',
+    'equipment:media',
+    'equipment:status',
+    'equipment:qr',
     'maintenance:create',
   ],
-  [Role.BIOMEDICAL_ENGINEER]: ['equipment:edit', 'maintenance:create'],
   [Role.DEPARTMENT_USER]: [],
 };
 

@@ -24,6 +24,10 @@ export interface MaintenanceRecord {
   performedDate?: string;
   nextDueDate?: string;
   engineer?: string | MaintenanceEngineerRef;
+  verificationInCharge?: string | MaintenanceEngineerRef;
+  verifiedBy?: string | MaintenanceEngineerRef;
+  verifiedAt?: string;
+  verificationNotes?: string;
   serviceReport?: string;
   photoUrls?: string[];
   createdAt?: string;
@@ -48,6 +52,10 @@ export interface CompleteMaintenanceDto {
   serviceReport: string;
 }
 
+export interface VerifyMaintenanceDto {
+  verificationNotes?: string;
+}
+
 export interface MaintenanceListQuery extends PaginationQuery {
   equipment?: string;
   engineer?: string;
@@ -61,5 +69,6 @@ export const MAINTENANCE_STATUS_LABEL: Record<MaintenanceStatus, string> = {
   [MaintenanceStatus.SCHEDULED]: 'Scheduled',
   [MaintenanceStatus.IN_PROGRESS]: 'In Progress',
   [MaintenanceStatus.OVERDUE]: 'Overdue',
+  [MaintenanceStatus.PENDING_VERIFICATION]: 'Pending Verification',
   [MaintenanceStatus.COMPLETED]: 'Completed',
 };

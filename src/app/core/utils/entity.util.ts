@@ -113,6 +113,7 @@ export function normalizeEquipment(raw: unknown): Equipment {
     manufacturer: String(record['manufacturer'] ?? ''),
     model: record['model'] ? String(record['model']) : undefined,
     serialNumber: String(record['serialNumber'] ?? ''),
+    barcodeTagNumber: String(record['barcodeTagNumber'] ?? ''),
     status: record['status'] as EquipmentStatus,
     department: normalizeEquipmentDepartment(record['department']),
     roomLocation: record['roomLocation'] ? String(record['roomLocation']) : undefined,
@@ -192,6 +193,16 @@ export function normalizeMaintenance(raw: unknown): MaintenanceRecord {
     nextDueDate: record['nextDueDate'] as string | undefined,
     engineer: record['engineer']
       ? (normalizeMaintenanceRef(record['engineer']) as string | MaintenanceEngineerRef)
+      : undefined,
+    verificationInCharge: record['verificationInCharge']
+      ? (normalizeMaintenanceRef(record['verificationInCharge']) as string | MaintenanceEngineerRef)
+      : undefined,
+    verifiedBy: record['verifiedBy']
+      ? (normalizeMaintenanceRef(record['verifiedBy']) as string | MaintenanceEngineerRef)
+      : undefined,
+    verifiedAt: record['verifiedAt'] as string | undefined,
+    verificationNotes: record['verificationNotes']
+      ? String(record['verificationNotes'])
       : undefined,
     serviceReport: record['serviceReport'] ? String(record['serviceReport']) : undefined,
     photoUrls: Array.isArray(record['photoUrls'])
